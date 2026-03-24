@@ -18,31 +18,4 @@ abstract class AppDatabase : RoomDatabase() {
     // Solo tengo que declararlos aquí como funciones abstractas.
     abstract fun pacienteDao(): PacienteDao
     abstract fun usuarioDao(): UsuarioDao
-
-    // companion object es como el "static" de Java.
-    // Aquí implemento el patrón Singleton: que solo exista UNA instancia
-    // de la base de datos en toda la app. Crear múltiples instancias
-    // puede causar errores y desperdicia memoria.
-    companion object {
-
-        // @Volatile asegura que todos los hilos (threads) vean el mismo valor de INSTANCE.
-        // Sin esto, dos hilos podrían crear dos bases de datos al mismo tiempo.
-        @Volatile
-        private var INSTANCE: AppDatabase? = null
-
-        fun getDatabase(context: Context): AppDatabase {
-            // Si ya existe una instancia, la devuelvo directamente (sin crear otra).
-            // Si no existe, entro al bloque synchronized para crearla.
-            // synchronized(this) evita que dos hilos creen la instancia al mismo tiempo.
-            return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
-                    context.applicationContext, // Uso applicationContext para evitar memory leaks
-                    AppDatabase::class.java,
-                    "ximca_database"            // Este es el nombre del archivo .db en el dispositivo
-                ).build()
-                INSTANCE = instance
-                instance
-            }
-        }
-    }
 }

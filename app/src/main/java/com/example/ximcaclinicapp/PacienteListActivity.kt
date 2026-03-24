@@ -8,9 +8,13 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.ximcaclinicapp.databinding.ActivityPacienteListBinding
+import com.example.ximcaclinicapp.ui.PacienteAdapter
+import com.example.ximcaclinicapp.viewmodel.PacienteViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
 // Esta es la pantalla principal del CRUD: muestra la lista de todos los pacientes
 // en un RecyclerView (lista scrolleable) y tiene el botón + para agregar uno nuevo.
+@AndroidEntryPoint
 class PacienteListActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPacienteListBinding
@@ -44,6 +48,7 @@ class PacienteListActivity : AppCompatActivity() {
                     putExtra("estado", paciente.estado)
                 }
                 startActivity(intent)
+                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
             },
             onDeleteClick = { paciente ->
                 // Antes de eliminar, pido confirmación con un diálogo para evitar borrados accidentales
@@ -76,6 +81,7 @@ class PacienteListActivity : AppCompatActivity() {
         // El FAB (Floating Action Button) con el ícono "+" abre el formulario de creación
         binding.fabAgregarPaciente.setOnClickListener {
             startActivity(Intent(this, PacienteFormActivity::class.java))
+            overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
             // No paso ningún extra → PacienteFormActivity sabrá que es modo CREAR
         }
 
@@ -86,6 +92,7 @@ class PacienteListActivity : AppCompatActivity() {
     // Cuando toco la flecha de volver en la barra superior, cierro esta pantalla
     override fun onSupportNavigateUp(): Boolean {
         finish()
+        overridePendingTransition(android.R.anim.slide_out_right, android.R.anim.slide_in_left)
         return true
     }
 }

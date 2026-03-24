@@ -3,21 +3,27 @@ package com.example.ximcaclinicapp
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.ximcaclinicapp.data.Paciente
 import com.example.ximcaclinicapp.databinding.ActivityPacienteFormBinding
 import com.example.ximcaclinicapp.utils.CalculosMedico
+import com.example.ximcaclinicapp.utils.PacienteValidator
+import com.example.ximcaclinicapp.viewmodel.PacienteViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
 // Este formulario sirve para DOS cosas: crear un paciente nuevo Y editar uno existente.
 // Sé en qué modo estoy según si me llegó un "id" en el Intent:
 //   - id = -1 (o no llegó nada) → modo CREAR
 //   - id >= 0                    → modo EDITAR (ese es el ID del paciente a editar)
+@AndroidEntryPoint
 class PacienteFormActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPacienteFormBinding
     private val viewModel: PacienteViewModel by viewModels()
+    private val validator = PacienteValidator()
 
     // Guardo el ID del paciente. Si es -1, es porque estoy creando uno nuevo.
     private var pacienteId: Int = -1
@@ -99,64 +105,13 @@ class PacienteFormActivity : AppCompatActivity() {
 
     // Función que valida todos los campos y guarda el paciente si todo está bien
     private fun guardarPaciente() {
-        val nombre = binding.etNombre.text.toString().trim()
-        val apellido = binding.etApellido.text.toString().trim()
-        val fecha = binding.etFechaNacimiento.text.toString().trim()
-        val pesoStr = binding.etPeso.text.toString().trim()
-        val estaturaStr = binding.etEstatura.text.toString().trim()
-        val antecedentes = binding.etAntecedentes.text.toString().trim()
-        val estado = binding.etEstado.text.toString().trim().ifEmpty { "EN_ESPERA" }
+        if (!validateFields()) return
 
-        // --- VALIDACIONES ---
-        // Valido campo por campo y paro en el primero que falle.
-        // El error aparece visualmente debajo del campo con texto rojo.
+        // Mostrar indicador de carga
+        binding.btnGuardar.isEnabled = false
+        binding.progressBar.visibility = View.VISIBLE
 
-        if (nombre.isEmpty()) {
-            binding.tilNombre.error = "El nombre es obligatorio"
-            return
-        } else binding.tilNombre.error = null
-
-        if (apellido.isEmpty()) {
-            binding.tilApellido.error = "El apellido es obligatorio"
-            return
-        } else binding.tilApellido.error = null
-
-        if (fecha.isEmpty()) {
-            binding.tilFechaNacimiento.error = "La fecha es obligatoria"
-            return
-        } else binding.tilFechaNacimiento.error = null
-
-        // toDoubleOrNull() es seguro: si el texto no es un número válido, devuelve null
-        // en vez de lanzar una excepción que crashearía la app.
-        val peso = pesoStr.toDoubleOrNull()
-        if (peso == null || peso <= 0) {
-            binding.tilPeso.error = "Ingresa un peso válido en kg"
-            return
-        } else binding.tilPeso.error = null
-
-        val estatura = estaturaStr.toDoubleOrNull()
-        if (estatura == null || estatura <= 0) {
-            binding.tilEstatura.error = "Ingresa una estatura válida en metros (ej: 1.70)"
-            return
-        } else binding.tilEstatura.error = null
-
-        // Calculo el IMC final con los valores validados
-        val imc = CalculosMedico.calcularIMC(peso, estatura)
-
-        // Construyo el objeto Paciente con todos los datos del formulario.
-        // Si estoy editando, uso el ID original (pacienteId) para que Room sepa
-        // qué registro actualizar. Si estoy creando, id = 0 y Room asigna uno nuevo.
-        val paciente = Paciente(
-            id = if (modoEdicion) pacienteId else 0,
-            nombre = nombre,
-            apellido = apellido,
-            fechaNacimiento = fecha,
-            peso = peso,
-            estatura = estatura,
-            imc = imc,
-            antecedentes = antecedentes,
-            estado = estado
-        )
+        val paciente = createPacienteFromForm()
 
         // Le digo al ViewModel qué operación hacer (insert o update)
         if (modoEdicion) {
@@ -169,6 +124,57 @@ class PacienteFormActivity : AppCompatActivity() {
 
         // Cierro el formulario. La lista se actualizará sola gracias al Flow+LiveData.
         finish()
+    }
+
+    // Valida todos los campos del formulario
+    private fun validateFields(): Boolean {
+        val nombre = binding.etNombre.text.toString()
+        val apellido = binding.etApellido.text.toString()
+        val fecha = binding.etFechaNacimiento.text.toString()
+        val pesoStr = binding.etPeso.text.toString()
+        val estaturaStr = binding.etEstatura.text.toString()
+
+        val errors = validator.validateFields(nombre, apellido, fecha, pesoStr, estaturaStr)
+
+        // Limpiar errores previos
+        binding.tilNombre.error = null
+        binding.tilApellido.error = null
+        binding.tilFechaNacimiento.error = null
+        binding.tilPeso.error = null
+        binding.tilEstatura.error = null
+
+        // Mostrar errores
+        errors["nombre"]?.let { binding.tilNombre.error = it }
+        errors["apellido"]?.let { binding.tilApellido.error = it }
+        errors["fechaNacimiento"]?.let { binding.tilFechaNacimiento.error = it }
+        errors["peso"]?.let { binding.tilPeso.error = it }
+        errors["estatura"]?.let { binding.tilEstatura.error = it }
+
+        return errors.isEmpty()
+    }
+
+    // Crea el objeto Paciente a partir de los datos del formulario
+    private fun createPacienteFromForm(): Paciente {
+        val nombre = binding.etNombre.text.toString().trim()
+        val apellido = binding.etApellido.text.toString().trim()
+        val fecha = binding.etFechaNacimiento.text.toString().trim()
+        val peso = binding.etPeso.text.toString().toDouble()
+        val estatura = binding.etEstatura.text.toString().toDouble()
+        val antecedentes = binding.etAntecedentes.text.toString().trim()
+        val estado = binding.etEstado.text.toString().trim().ifEmpty { "EN_ESPERA" }
+        val imc = CalculosMedico.calcularIMC(peso, estatura)
+
+        return Paciente(
+            id = if (modoEdicion) pacienteId else 0,
+            nombre = nombre,
+            apellido = apellido,
+            fechaNacimiento = fecha,
+            peso = peso,
+            estatura = estatura,
+            imc = imc,
+            antecedentes = antecedentes,
+            estado = estado
+        )
     }
 
     override fun onSupportNavigateUp(): Boolean {

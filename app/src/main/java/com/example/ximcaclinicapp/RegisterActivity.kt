@@ -1,27 +1,33 @@
 package com.example.ximcaclinicapp
 
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.ximcaclinicapp.data.AppDatabase
 import com.example.ximcaclinicapp.data.Usuario
+import com.example.ximcaclinicapp.data.UsuarioDao
 import com.example.ximcaclinicapp.databinding.ActivityRegisterBinding
+import com.example.ximcaclinicapp.utils.PasswordUtils
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 // RegisterActivity es la pantalla donde el médico crea su cuenta.
 // Solo se llega aquí desde el link en LoginActivity.
+@AndroidEntryPoint
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityRegisterBinding
+
+    // Hilt inyecta el DAO automáticamente, igual que en LoginActivity
+    @Inject
+    lateinit var usuarioDao: UsuarioDao
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        val database = AppDatabase.getDatabase(this)
-        val usuarioDao = database.usuarioDao()
 
         binding.btnRegistrar.setOnClickListener {
             val nombre = binding.etNombre.text.toString().trim()
@@ -49,24 +55,37 @@ class RegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             } else binding.tilPasswordReg.error = null
 
+            // Mostrar indicador de carga
+            binding.btnRegistrar.isEnabled = false
+            binding.progressBar.visibility = View.VISIBLE
+
             // Todo válido: creo el objeto Usuario y lo guardo en la base de datos
             lifecycleScope.launch {
+                // Hasheo la contraseña con SHA-256 antes de guardarla.
+                // Así aunque alguien vea la base de datos, no ve la contraseña en texto plano.
+                val hashedPassword = PasswordUtils.hashPassword(password)
                 val nuevoUsuario = Usuario(
                     nombre = nombre,
                     email = email,
-                    password = password
+                    password = hashedPassword
                     // rol se queda en "MÉDICO" por defecto (está definido en la clase Usuario)
                 )
                 usuarioDao.registrarUsuario(nuevoUsuario)
 
-                Toast.makeText(
-                    this@RegisterActivity,
-                    "Cuenta creada exitosamente. Inicia sesión.",
-                    Toast.LENGTH_SHORT
-                ).show()
+                // Volver al hilo principal para actualizar UI
+                runOnUiThread {
+                    binding.btnRegistrar.isEnabled = true
+                    binding.progressBar.visibility = View.GONE
 
-                // finish() cierra esta pantalla y regresa automáticamente al Login
-                finish()
+                    Toast.makeText(
+                        this@RegisterActivity,
+                        "Cuenta creada exitosamente. Inicia sesión.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    // finish() cierra esta pantalla y regresa automáticamente al Login
+                    finish()
+                }
             }
         }
 

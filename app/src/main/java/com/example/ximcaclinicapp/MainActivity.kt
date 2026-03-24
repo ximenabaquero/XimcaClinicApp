@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity() {
         // Este botón lleva a la lista de pacientes (la pantalla con el RecyclerView)
         binding.btnVerPacientes.setOnClickListener {
             startActivity(Intent(this, PacienteListActivity::class.java))
+            overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
         }
 
         // Cerrar sesión: limpio SharedPreferences y vuelvo al Login.
@@ -48,6 +49,7 @@ class MainActivity : AppCompatActivity() {
         binding.btnLogout.setOnClickListener {
             prefs.edit().clear().apply() // Borro TODOS los datos de sesión
             startActivity(Intent(this, LoginActivity::class.java))
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
             finish()
         }
     }

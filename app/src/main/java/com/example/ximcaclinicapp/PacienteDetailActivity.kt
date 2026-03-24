@@ -8,11 +8,14 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.ximcaclinicapp.data.Paciente
 import com.example.ximcaclinicapp.databinding.ActivityPacienteDetailBinding
 import com.example.ximcaclinicapp.utils.CalculosMedico
+import com.example.ximcaclinicapp.viewmodel.PacienteViewModel
 import com.example.ximcaclinicapp.R
+import dagger.hilt.android.AndroidEntryPoint
 
 // Esta pantalla muestra TODOS los datos de un paciente específico.
 // Llego aquí desde PacienteListActivity cuando toco una tarjeta.
 // Desde aquí puedo editar o eliminar al paciente.
+@AndroidEntryPoint
 class PacienteDetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPacienteDetailBinding
@@ -96,9 +99,10 @@ class PacienteDetailActivity : AppCompatActivity() {
         binding.tvPeso.text = "${paciente.peso} kg"
         binding.tvEstatura.text = "${paciente.estatura} m"
 
-        // Obtengo la clasificación textual del IMC (Normal, Sobrepeso, etc.)
-        val nivel = CalculosMedico.obtenerNivelPeso(paciente.imc)
-        binding.tvImc.text = "${paciente.imc}  —  $nivel"
+        // Clasificación quirúrgica completa del IMC
+        val clasificacion = CalculosMedico.obtenerClasificacionCirugiaPlastica(paciente.imc)
+        binding.tvImc.text = "${paciente.imc}  —  ${clasificacion.categoria} · ${clasificacion.grado}"
+        binding.tvNotaQuirurgica.text = clasificacion.relevanciaQuirurgica
 
         // Si no hay antecedentes, muestro "Ninguno" en vez de dejarlo en blanco
         binding.tvAntecedentes.text = paciente.antecedentes.ifEmpty { "Ninguno" }

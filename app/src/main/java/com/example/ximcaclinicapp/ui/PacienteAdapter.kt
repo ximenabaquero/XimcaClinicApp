@@ -1,4 +1,4 @@
-package com.example.ximcaclinicapp
+package com.example.ximcaclinicapp.ui
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -49,11 +49,7 @@ class PacienteAdapter(
             binding.tvEstadoPaciente.text = paciente.estado
 
             // Asigno el badge de color según el estado del paciente
-            val (bgRes, textColorRes) = when (paciente.estado) {
-                "EN_CONSULTA" -> Pair(R.drawable.bg_badge_en_consulta, R.color.status_en_consulta_text)
-                "ALTA"        -> Pair(R.drawable.bg_badge_alta, R.color.status_alta_text)
-                else          -> Pair(R.drawable.bg_badge_en_espera, R.color.status_en_espera_text)
-            }
+            val (bgRes, textColorRes) = getBadgeResources(paciente.estado)
             binding.tvEstadoPaciente.setBackgroundResource(bgRes)
             binding.tvEstadoPaciente.setTextColor(
                 binding.root.context.getColor(textColorRes)
@@ -68,6 +64,15 @@ class PacienteAdapter(
 
             // Cuando toco solo el botón X, ejecuto onDeleteClick
             binding.btnEliminar.setOnClickListener { onDeleteClick(paciente) }
+        }
+    }
+
+    // Devuelve los recursos de badge según el estado del paciente
+    private fun getBadgeResources(estado: String): Pair<Int, Int> {
+        return when (estado) {
+            "EN_CONSULTA" -> Pair(R.drawable.bg_badge_en_consulta, R.color.status_en_consulta_text)
+            "ALTA" -> Pair(R.drawable.bg_badge_alta, R.color.status_alta_text)
+            else -> Pair(R.drawable.bg_badge_en_espera, R.color.status_en_espera_text)
         }
     }
 

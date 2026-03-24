@@ -19,14 +19,56 @@ object CalculosMedico {
         return String.format(Locale.US, "%.2f", imc).toDouble()
     }
 
-    // Con el IMC ya calculado, digo en qué rango está el paciente.
-    // Estos rangos son los estándar de la Organización Mundial de la Salud (OMS).
-    fun obtenerNivelPeso(imc: Double): String {
+    // Versión resumida usada en las tarjetas del listado y el formulario (texto corto).
+    // Llama internamente a la clasificación completa para no duplicar la lógica de rangos.
+    fun obtenerNivelPeso(imc: Double): String =
+        obtenerClasificacionCirugiaPlastica(imc).categoria
+
+    /**
+     * Clasificación de IMC para Consultorio de Cirugía Plástica.
+     * Basado en criterios OMS y clasificación quirúrgica estándar (ASA/Clasificación de Obesidad).
+     */
+    fun obtenerClasificacionCirugiaPlastica(imc: Double): ClasificacionIMC {
         return when {
-            imc < 18.5            -> "Bajo peso"
-            imc in 18.5..24.9     -> "Normal"
-            imc in 25.0..29.9     -> "Sobrepeso"
-            else                  -> "Obesidad"
+            imc < 18.5 -> ClasificacionIMC(
+                categoria = "Bajo Peso",
+                grado = if (imc < 17.0) "Severo / Moderado" else "Leve",
+                relevanciaQuirurgica = "Riesgo de mala cicatrización y déficit nutricional. Posponer procedimiento electivo hasta recuperación ponderal."
+            )
+            imc in 18.5..24.9 -> ClasificacionIMC(
+                categoria = "Normopeso",
+                grado = "Peso Ideal Quirúrgico",
+                relevanciaQuirurgica = "Candidato óptimo. Menor tasa de complicaciones. Tejidos con trofismo adecuado."
+            )
+            imc in 25.0..29.9 -> ClasificacionIMC(
+                categoria = "Sobrepeso",
+                grado = "Pre-obesidad",
+                relevanciaQuirurgica = "Aceptable para procedimientos estéticos. Lipoescultura y abdominoplastia viables con buenos resultados."
+            )
+            imc in 30.0..34.9 -> ClasificacionIMC(
+                categoria = "Obesidad",
+                grado = "Grado I (Leve)",
+                relevanciaQuirurgica = "Riesgo anestésico leve. Resultado estético limitado. Requiere consentimiento informado específico sobre limitaciones."
+            )
+            imc in 35.0..39.9 -> ClasificacionIMC(
+                categoria = "Obesidad",
+                grado = "Grado II (Moderada)",
+                relevanciaQuirurgica = "Alto riesgo de necrosis grasa, dehiscencia de sutura y TVP. Considerar pérdida de peso preoperatoria obligatoria."
+            )
+            else -> ClasificacionIMC(
+                categoria = "Obesidad Mórbida",
+                grado = "Grado III (Severa)",
+                relevanciaQuirurgica = "Contraindicación relativa para cirugía estética ambulatoria. Requiere manejo en ámbito hospitalario y valoración por cirugía bariátrica previa."
+            )
         }
     }
 }
+
+/**
+ * Modelo de datos específico para historia clínica de Cirugía Plástica.
+ */
+data class ClasificacionIMC(
+    val categoria: String,             // Ej: "Normopeso"
+    val grado: String,                 // Ej: "Grado I (Leve)"
+    val relevanciaQuirurgica: String   // Nota clínica para el cirujano o consentimiento informado
+)

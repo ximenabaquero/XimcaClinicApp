@@ -2,20 +2,27 @@ package com.example.ximcaclinicapp
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.ximcaclinicapp.data.AppDatabase
+import com.example.ximcaclinicapp.data.UsuarioDao
 import com.example.ximcaclinicapp.databinding.ActivityLoginBinding
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 // LoginActivity es la primera pantalla que ve el usuario.
 // Aquí verifico si ya hay sesión guardada, y si la hay, salto directo al dashboard.
+@AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
 
     // ViewBinding: en lugar de buscar vistas con findViewById (que puede crashear
     // si me equivoco el ID), binding me da acceso directo y seguro a todas las vistas del XML.
     private lateinit var binding: ActivityLoginBinding
+
+    @Inject
+    lateinit var usuarioDao: UsuarioDao
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,9 +43,6 @@ class LoginActivity : AppCompatActivity() {
         // Si llegué aquí es porque NO hay sesión activa. Muestro el formulario de login.
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        val database = AppDatabase.getDatabase(this)
-        val usuarioDao = database.usuarioDao()
 
         binding.btnLogin.setOnClickListener {
             val email = binding.etEmail.text.toString().trim()    // .trim() quita espacios al inicio y al final
@@ -61,12 +65,22 @@ class LoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             } else binding.tilPassword.error = null
 
+            // Mostrar indicador de carga
+            binding.btnLogin.isEnabled = false
+            binding.progressBar.visibility = View.VISIBLE
+
             // lifecycleScope.launch crea una "corrutina": código que corre en segundo plano
             // sin bloquear la pantalla. Room NO permite consultas en el hilo principal (UI thread).
             lifecycleScope.launch {
                 // Le pregunto a la base de datos si existe ese email+contraseña.
                 // Devuelve el Usuario si existe, o null si no.
                 val user = usuarioDao.login(email, password)
+
+                // Ocultar indicador de carga
+                runOnUiThread {
+                    binding.btnLogin.isEnabled = true
+                    binding.progressBar.visibility = View.GONE
+                }
 
                 if (user != null) {
                     // ¡Login exitoso! Guardo los datos del usuario en SharedPreferences.
@@ -86,6 +100,7 @@ class LoginActivity : AppCompatActivity() {
 
                     // Voy al dashboard principal
                     startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                     finish()
                 } else {
                     // Credenciales incorrectas. No digo si falló el email o la contraseña
@@ -102,6 +117,7 @@ class LoginActivity : AppCompatActivity() {
         // Si no tiene cuenta, la mando a registrarse
         binding.tvRegister.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
+            overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right)
         }
     }
 }
