@@ -9,54 +9,99 @@ import com.example.ximcaclinicapp.data.AppDatabase
 import com.example.ximcaclinicapp.databinding.ActivityLoginBinding
 import kotlinx.coroutines.launch
 
+// LoginActivity es la primera pantalla que ve el usuario.
+// Aquí verifico si ya hay sesión guardada, y si la hay, salto directo al dashboard.
 class LoginActivity : AppCompatActivity() {
 
+    // ViewBinding: en lugar de buscar vistas con findViewById (que puede crashear
+    // si me equivoco el ID), binding me da acceso directo y seguro a todas las vistas del XML.
     private lateinit var binding: ActivityLoginBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
-        // Inicializar View Binding
+
+        // SharedPreferences es como un pequeño archivo de configuración donde guardo
+        // datos simples (nombre, email, ID del usuario logueado).
+        // "session" es el nombre del archivo. MODE_PRIVATE = solo mi app puede leerlo.
+        val prefs = getSharedPreferences("session", MODE_PRIVATE)
+
+        // Si ya hay un userId guardado, significa que el usuario ya inició sesión antes
+        // y no cerró sesión. Lo mando directo al dashboard sin que tenga que loguearse de nuevo.
+        if (prefs.contains("userId")) {
+            startActivity(Intent(this, MainActivity::class.java))
+            finish() // finish() cierra esta pantalla para que no vuelva atrás con el botón back
+            return   // Salgo del onCreate, no ejecuto nada más
+        }
+
+        // Si llegué aquí es porque NO hay sesión activa. Muestro el formulario de login.
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Initializing the database connection
         val database = AppDatabase.getDatabase(this)
         val usuarioDao = database.usuarioDao()
 
-        // Defining the trigger mechanism for the Login button
         binding.btnLogin.setOnClickListener {
-            val email = binding.etEmail.text.toString().trim()
+            val email = binding.etEmail.text.toString().trim()    // .trim() quita espacios al inicio y al final
             val password = binding.etPassword.text.toString().trim()
 
-            // System check: No empty voids allowed
-            if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Error: Incomplete parameters.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
+            // --- VALIDACIONES ---
+            // Valido antes de consultar la base de datos para dar feedback inmediato al usuario.
+            if (email.isEmpty()) {
+                binding.tilEmail.error = "Ingresa tu correo" // Muestra el error debajo del campo
+                return@setOnClickListener // Detengo la ejecución aquí
+            } else binding.tilEmail.error = null // Limpio el error si ya es válido
 
-            // Asynchronous physics: We drop this query into a background thread
+            if (!email.contains("@")) {
+                binding.tilEmail.error = "Ingresa un correo válido"
+                return@setOnClickListener
+            } else binding.tilEmail.error = null
+
+            if (password.isEmpty()) {
+                binding.tilPassword.error = "Ingresa tu contraseña"
+                return@setOnClickListener
+            } else binding.tilPassword.error = null
+
+            // lifecycleScope.launch crea una "corrutina": código que corre en segundo plano
+            // sin bloquear la pantalla. Room NO permite consultas en el hilo principal (UI thread).
             lifecycleScope.launch {
+                // Le pregunto a la base de datos si existe ese email+contraseña.
+                // Devuelve el Usuario si existe, o null si no.
                 val user = usuarioDao.login(email, password)
 
                 if (user != null) {
-                    // Access Granted: Shift the user to the MainActivity
-                    Toast.makeText(this@LoginActivity, "Access Granted: Welcome, ${user.nombre}", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this@LoginActivity, MainActivity::class.java)
-                    startActivity(intent)
+                    // ¡Login exitoso! Guardo los datos del usuario en SharedPreferences.
+                    // Así la próxima vez que abra la app, no tiene que volver a loguearse.
+                    prefs.edit()
+                        .putInt("userId", user.id)
+                        .putString("userName", user.nombre)
+                        .putString("userEmail", user.email)
+                        .putString("userRol", user.rol)
+                        .apply() // .apply() guarda de forma asíncrona (no bloquea)
+
+                    Toast.makeText(
+                        this@LoginActivity,
+                        "Bienvenido, ${user.nombre}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    // Voy al dashboard principal
+                    startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                     finish()
                 } else {
-                    // Access Denied
-                    Toast.makeText(this@LoginActivity, "Access Denied: Invalid credentials.", Toast.LENGTH_SHORT).show()
+                    // Credenciales incorrectas. No digo si falló el email o la contraseña
+                    // por seguridad (no quiero darle pistas a alguien malintencionado).
+                    Toast.makeText(
+                        this@LoginActivity,
+                        "Correo o contraseña incorrectos",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
 
-        // Defining the trigger for the Registration text
+        // Si no tiene cuenta, la mando a registrarse
         binding.tvRegister.setOnClickListener {
-            // Documento de solicitud para transicionar a la otra pantalla
-            val intent = Intent(this, RegisterActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, RegisterActivity::class.java))
         }
     }
 }
