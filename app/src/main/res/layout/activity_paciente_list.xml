@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    activity_paciente_list.xml — Pantalla de lista de pacientes (vista 3 del proyecto)
+
+    Uso CoordinatorLayout como raíz porque coordina el comportamiento entre la barra
+    superior (AppBar) y el RecyclerView (cuando hago scroll, la barra puede esconderse o no).
+    También maneja la posición del FAB para que no tape el contenido.
+-->
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".PacienteListActivity">
+
+    <!-- AppBarLayout + Toolbar = la barra de título de la pantalla -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/purple_700"
+            android:title="Pacientes"
+            android:titleTextColor="@color/white"
+            app:navigationIcon="@drawable/ic_launcher_foreground" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!--
+        El RecyclerView es la lista que muestra los pacientes.
+        app:layout_behavior hace que respete el espacio de la AppBar de arriba.
+        paddingBottom="80dp" es para que el último ítem no quede tapado por el FAB.
+        clipToPadding="false" permite que la lista haga scroll hasta el borde real
+        aunque tenga padding (el ítem se ve completo al llegar al final).
+    -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewPacientes"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="8dp"
+        android:paddingBottom="80dp"
+        android:clipToPadding="false"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:listitem="@layout/item_paciente" />
+
+    <!--
+        Mensaje que aparece cuando no hay pacientes en la base de datos.
+        Está oculto por defecto (visibility="gone"). Lo muestro desde el código
+        cuando la lista está vacía.
+    -->
+    <TextView
+        android:id="@+id/tvListaVacia"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="No hay pacientes registrados.\nPresiona + para agregar uno."
+        android:textAlignment="center"
+        android:textColor="#999999"
+        android:textSize="16sp"
+        android:visibility="gone" />
+
+    <!--
+        FAB = Floating Action Button. El botón circular con el ícono "+" que flota
+        sobre la lista. layout_gravity="bottom|end" lo coloca abajo a la derecha.
+        Al tocarlo se abre el formulario para crear un nuevo paciente.
+    -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAgregarPaciente"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:contentDescription="Agregar paciente"
+        android:src="@android:drawable/ic_input_add"
+        app:backgroundTint="@color/purple_700" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
