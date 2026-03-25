@@ -11,6 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.XimcaClinicApp">
+<<<<<<< HEAD
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -20,6 +21,29 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+=======
+
+        <!-- LoginActivity la pantalla de inicio -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Registro -->
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false" />
+
+        <!-- Pantalla Principal tras el Login -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
+
+>>>>>>> 288dd03 (DFW)
     </application>
 
 </manifest>
