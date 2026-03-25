@@ -9,6 +9,8 @@ import com.example.ximcaclinicapp.data.Usuario
 import com.example.ximcaclinicapp.databinding.ActivityRegisterBinding
 import kotlinx.coroutines.launch
 
+// RegisterActivity es la pantalla donde el médico crea su cuenta.
+// Solo se llega aquí desde el link en LoginActivity.
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityRegisterBinding
@@ -26,22 +28,49 @@ class RegisterActivity : AppCompatActivity() {
             val email = binding.etEmailReg.text.toString().trim()
             val password = binding.etPasswordReg.text.toString().trim()
 
-            if (nombre.isEmpty() || email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Por favor, completa todos los campos", Toast.LENGTH_SHORT).show()
+            // --- VALIDACIONES ---
+            // Estas validaciones cumplen con el requisito mínimo del proyecto:
+            // email no vacío + contraseña de al menos 6 caracteres.
+
+            if (nombre.isEmpty()) {
+                binding.tilNombre.error = "El nombre es obligatorio"
                 return@setOnClickListener
-            }
+            } else binding.tilNombre.error = null
 
+            // Verifico que el email tenga @ para asegurar que es un correo real
+            if (email.isEmpty() || !email.contains("@")) {
+                binding.tilEmailReg.error = "Ingresa un correo electrónico válido"
+                return@setOnClickListener
+            } else binding.tilEmailReg.error = null
+
+            // Requisito del proyecto: contraseña mínimo 6 caracteres
+            if (password.length < 6) {
+                binding.tilPasswordReg.error = "La contraseña debe tener al menos 6 caracteres"
+                return@setOnClickListener
+            } else binding.tilPasswordReg.error = null
+
+            // Todo válido: creo el objeto Usuario y lo guardo en la base de datos
             lifecycleScope.launch {
-                val nuevoUsuario = Usuario(nombre = nombre, email = email, password = password)
-                // Usamos el nombre correcto de la función definido en UsuarioDao
+                val nuevoUsuario = Usuario(
+                    nombre = nombre,
+                    email = email,
+                    password = password
+                    // rol se queda en "MÉDICO" por defecto (está definido en la clase Usuario)
+                )
                 usuarioDao.registrarUsuario(nuevoUsuario)
-                Toast.makeText(this@RegisterActivity, "Usuario registrado con éxito", Toast.LENGTH_SHORT).show()
-                finish() // Regresa al Login
+
+                Toast.makeText(
+                    this@RegisterActivity,
+                    "Cuenta creada exitosamente. Inicia sesión.",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                // finish() cierra esta pantalla y regresa automáticamente al Login
+                finish()
             }
         }
 
-        binding.tvVolverLogin.setOnClickListener {
-            finish()
-        }
+        // El link de "ya tengo cuenta" también cierra esta pantalla y vuelve al Login
+        binding.tvVolverLogin.setOnClickListener { finish() }
     }
 }

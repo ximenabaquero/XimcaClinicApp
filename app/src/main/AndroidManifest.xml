@@ -11,19 +11,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.XimcaClinicApp">
-<<<<<<< HEAD
-        <activity
-            android:name=".MainActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-=======
-
-        <!-- LoginActivity la pantalla de inicio -->
+        <!-- Pantalla de inicio: Login -->
         <activity
             android:name=".LoginActivity"
             android:exported="true">
@@ -33,17 +22,31 @@
             </intent-filter>
         </activity>
 
-        <!-- Registro -->
+        <!-- Registro de nuevo médico -->
         <activity
             android:name=".RegisterActivity"
             android:exported="false" />
 
-        <!-- Pantalla Principal tras el Login -->
+        <!-- Dashboard principal (post-login) -->
         <activity
             android:name=".MainActivity"
             android:exported="false" />
 
->>>>>>> 288dd03 (DFW)
+        <!-- Lista de pacientes (RecyclerView CRUD) -->
+        <activity
+            android:name=".PacienteListActivity"
+            android:exported="false" />
+
+        <!-- Detalle de un paciente -->
+        <activity
+            android:name=".PacienteDetailActivity"
+            android:exported="false" />
+
+        <!-- Formulario crear / editar paciente -->
+        <activity
+            android:name=".PacienteFormActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>
