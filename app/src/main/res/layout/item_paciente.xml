@@ -1,77 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    item_paciente.xml — Es el diseño de UNA tarjeta en la lista de pacientes.
-    El RecyclerView reutiliza este XML para cada elemento de la lista.
-    Uso MaterialCardView para darle el efecto de "tarjeta" con sombra y bordes redondeados.
--->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
     android:layout_marginVertical="6dp"
-    app:cardCornerRadius="10dp"
-    app:cardElevation="3dp">
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/card_stroke"
+    app:strokeWidth="1dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <!-- Nombre completo del paciente (nombre + apellido) -->
+        <!-- Nombre completo -->
         <TextView
             android:id="@+id/tvNombrePaciente"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
             android:text="Nombre Apellido"
+            android:textColor="@color/text_primary"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@id/btnEliminar"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Estado actual del paciente (EN_ESPERA, EN_CONSULTA, ALTA) -->
+        <!-- Estado (badge pill) -->
         <TextView
             android:id="@+id/tvEstadoPaciente"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_badge_en_espera"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="3dp"
             android:text="EN_ESPERA"
-            android:textSize="12sp"
-            android:textColor="@color/purple_500"
-            app:layout_constraintEnd_toStartOf="@id/btnEliminar"
+            android:textColor="@color/status_en_espera_text"
+            android:textSize="11sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvNombrePaciente" />
 
-        <!-- IMC del paciente con su clasificación (ej: "IMC: 22.5 — Normal") -->
+        <!-- IMC con chip -->
         <TextView
             android:id="@+id/tvImcPaciente"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_imc_chip"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="3dp"
             android:text="IMC: 22.5 — Normal"
-            android:textSize="12sp"
-            android:textColor="#666666"
-            app:layout_constraintEnd_toStartOf="@id/btnEliminar"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvEstadoPaciente" />
+            android:textColor="@color/text_secondary"
+            android:textSize="11sp"
+            app:layout_constraintBottom_toBottomOf="@id/tvEstadoPaciente"
+            app:layout_constraintStart_toEndOf="@id/tvEstadoPaciente"
+            app:layout_constraintTop_toTopOf="@id/tvEstadoPaciente" />
 
-        <!--
-            Botón eliminar (la "X") a la derecha de la tarjeta.
-            minWidth y minHeight en 0dp permiten que sea exactamente 48dp (mínimo accesible).
-            Al tocarlo se llama onDeleteClick en el Adapter, que muestra el AlertDialog de confirmación.
-        -->
+        <!-- Botón eliminar -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnEliminar"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:minWidth="0dp"
             android:minHeight="0dp"
-            android:padding="0dp"
             android:text="✕"
-            android:textColor="#F44336"
-            android:textSize="18sp"
+            android:textColor="@color/text_hint"
+            android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

@@ -1,7 +1,24 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
     <style name="Base.Theme.XimcaClinicApp" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <!-- Dark theme inherits M3 dark defaults; primary blue stays recognizable -->
+        <item name="colorPrimary">#FFA6C8FF</item>
+        <item name="colorOnPrimary">#FF002F65</item>
+        <item name="colorPrimaryContainer">#FF0D47A1</item>
+        <item name="colorOnPrimaryContainer">#FFD4E3FF</item>
+        <item name="colorSecondary">#FFA5D6A7</item>
+        <item name="colorOnSecondary">#FF003910</item>
+        <item name="colorSecondaryContainer">#FF1B5E20</item>
+        <item name="colorOnSecondaryContainer">#FFC8E6C9</item>
+        <item name="colorError">#FFFFB4AB</item>
+        <item name="colorOnError">#FF690005</item>
+        <item name="colorErrorContainer">#FF93000A</item>
+        <item name="colorOnErrorContainer">#FFFFDAD6</item>
+        <item name="android:colorBackground">#FF1A1C1E</item>
+        <item name="colorOnBackground">#FFE2E2E6</item>
+        <item name="colorSurface">#FF1A1C1E</item>
+        <item name="colorOnSurface">#FFE2E2E6</item>
+        <item name="colorSurfaceVariant">#FF42474E</item>
+        <item name="colorOnSurfaceVariant">#FFC3C7CF</item>
+        <item name="colorOutline">#FF8D9199</item>
     </style>
 </resources>

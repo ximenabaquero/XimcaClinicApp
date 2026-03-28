@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.ximcaclinicapp.data.Paciente
 import com.example.ximcaclinicapp.databinding.ActivityPacienteDetailBinding
 import com.example.ximcaclinicapp.utils.CalculosMedico
+import com.example.ximcaclinicapp.R
 
 // Esta pantalla muestra TODOS los datos de un paciente específico.
 // Llego aquí desde PacienteListActivity cuando toco una tarjeta.
@@ -81,16 +82,26 @@ class PacienteDetailActivity : AppCompatActivity() {
     private fun mostrarDatos() {
         binding.tvNombreCompleto.text = "${paciente.nombre} ${paciente.apellido}"
         binding.tvEstado.text = paciente.estado
-        binding.tvFechaNacimiento.text = "Fecha de nacimiento: ${paciente.fechaNacimiento}"
-        binding.tvPeso.text = "Peso: ${paciente.peso} kg"
-        binding.tvEstatura.text = "Estatura: ${paciente.estatura} m"
+
+        // Badge de color según el estado
+        val (bgRes, textColorRes) = when (paciente.estado) {
+            "EN_CONSULTA" -> Pair(R.drawable.bg_badge_en_consulta, R.color.status_en_consulta_text)
+            "ALTA"        -> Pair(R.drawable.bg_badge_alta, R.color.status_alta_text)
+            else          -> Pair(R.drawable.bg_badge_en_espera, R.color.status_en_espera_text)
+        }
+        binding.tvEstado.setBackgroundResource(bgRes)
+        binding.tvEstado.setTextColor(getColor(textColorRes))
+
+        binding.tvFechaNacimiento.text = paciente.fechaNacimiento
+        binding.tvPeso.text = "${paciente.peso} kg"
+        binding.tvEstatura.text = "${paciente.estatura} m"
 
         // Obtengo la clasificación textual del IMC (Normal, Sobrepeso, etc.)
         val nivel = CalculosMedico.obtenerNivelPeso(paciente.imc)
-        binding.tvImc.text = "IMC: ${paciente.imc} ($nivel)"
+        binding.tvImc.text = "${paciente.imc}  —  $nivel"
 
         // Si no hay antecedentes, muestro "Ninguno" en vez de dejarlo en blanco
-        binding.tvAntecedentes.text = "Antecedentes: ${paciente.antecedentes.ifEmpty { "Ninguno" }}"
+        binding.tvAntecedentes.text = paciente.antecedentes.ifEmpty { "Ninguno" }
     }
 
     override fun onSupportNavigateUp(): Boolean {
