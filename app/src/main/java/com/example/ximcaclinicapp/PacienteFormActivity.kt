@@ -41,6 +41,7 @@ class PacienteFormActivity : AppCompatActivity() {
             binding.etEstado.setText("EN_ESPERA")
         }
 
+        configurarFormatoFecha()
         configurarCalculoImc()
         binding.btnGuardar.setOnClickListener { guardarPaciente() }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -55,6 +56,34 @@ class PacienteFormActivity : AppCompatActivity() {
         binding.etImc.setText(intent.getDoubleExtra("imc", 0.0).toString())
         binding.etAntecedentes.setText(intent.getStringExtra("antecedentes"))
         binding.etEstado.setText(intent.getStringExtra("estado"))
+    }
+
+    private fun configurarFormatoFecha() {
+        var isFormatting = false
+        binding.etFechaNacimiento.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                if (isFormatting || s == null) return
+                isFormatting = true
+
+                // Extraer solo dígitos, máximo 8 (ddmmaaaa)
+                val digits = s.toString().filter { it.isDigit() }.take(8)
+
+                // Reconstruir con barras: dd/mm/aaaa
+                val result = StringBuilder()
+                for (i in digits.indices) {
+                    result.append(digits[i])
+                    // Solo agregar '/' si hay más dígitos por venir (evita barra flotante)
+                    if ((i == 1 || i == 3) && i < digits.lastIndex) {
+                        result.append('/')
+                    }
+                }
+
+                s.replace(0, s.length, result.toString())
+                isFormatting = false
+            }
+        })
     }
 
     private fun configurarCalculoImc() {

@@ -36,7 +36,7 @@ object CalculosMedico {
                 relevanciaQuirurgica = "Riesgo de mala cicatrización y déficit nutricional. Posponer procedimiento electivo hasta recuperación ponderal."
             )
             imc in 18.5..24.9 -> ClasificacionIMC(
-                categoria = "Normopeso",
+                categoria = "Peso Normal",
                 grado = "Peso Ideal Quirúrgico",
                 relevanciaQuirurgica = "Candidato óptimo. Menor tasa de complicaciones. Tejidos con trofismo adecuado."
             )
