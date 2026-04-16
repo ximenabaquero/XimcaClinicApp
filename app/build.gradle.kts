@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    kotlin("kapt") // Agregamos el plugin KAPT
+    alias(libs.plugins.ksp) // KSP reemplaza KAPT para Room
 }
 
 android {
@@ -48,11 +48,10 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.constraintlayout)
 
-    // --- ROOM con KAPT ---
-    val room_version = "2.6.1"
+    // --- ROOM con KSP (compatible con Kotlin 2.x / AGP 9.x) ---
+    val room_version = "2.7.0"
     implementation("androidx.room:room-runtime:$room_version")
-    implementation("androidx.room:room-ktx:$room_version")
-    kapt("androidx.room:room-compiler:$room_version") // Usamos KAPT en lugar de KSP
+    ksp("androidx.room:room-compiler:$room_version")
 
     // --- NAVEGACIÓN Y VIEWMODEL ---
     val nav_version = "2.7.7"
