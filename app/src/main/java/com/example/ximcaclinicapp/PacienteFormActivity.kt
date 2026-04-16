@@ -38,7 +38,7 @@ class PacienteFormActivity : AppCompatActivity() {
         } else {
             binding.tvTituloForm.text = "Nuevo Paciente"
             supportActionBar?.title = "Nuevo Paciente"
-            binding.etEstado.setText("EN_ESPERA")
+            binding.toggleEstado.check(R.id.btnEstadoEspera) // estado por defecto
         }
 
         configurarFormatoFecha()
@@ -55,7 +55,12 @@ class PacienteFormActivity : AppCompatActivity() {
         binding.etEstatura.setText(intent.getDoubleExtra("estatura", 0.0).toString())
         binding.etImc.setText(intent.getDoubleExtra("imc", 0.0).toString())
         binding.etAntecedentes.setText(intent.getStringExtra("antecedentes"))
-        binding.etEstado.setText(intent.getStringExtra("estado"))
+        // Seleccionar el botón correcto según el estado guardado
+        when (intent.getStringExtra("estado")) {
+            "EN_CONSULTA" -> binding.toggleEstado.check(R.id.btnEstadoConsulta)
+            "ALTA"        -> binding.toggleEstado.check(R.id.btnEstadoAlta)
+            else          -> binding.toggleEstado.check(R.id.btnEstadoEspera)
+        }
     }
 
     private fun configurarFormatoFecha() {
@@ -156,7 +161,11 @@ class PacienteFormActivity : AppCompatActivity() {
             estatura = estatura,
             imc = CalculosMedico.calcularIMC(peso, estatura),
             antecedentes = binding.etAntecedentes.text.toString().trim(),
-            estado = binding.etEstado.text.toString().trim().ifEmpty { "EN_ESPERA" }
+            estado = when (binding.toggleEstado.checkedButtonId) {
+                R.id.btnEstadoConsulta -> "EN_CONSULTA"
+                R.id.btnEstadoAlta     -> "ALTA"
+                else                   -> "EN_ESPERA"
+            }
         )
     }
 
