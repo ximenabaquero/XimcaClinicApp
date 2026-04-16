@@ -91,21 +91,25 @@
                     android:inputType="textPersonName" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Fecha nacimiento -->
+            <!-- Fecha nacimiento: toca para abrir calendario -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilFechaNacimiento"
                 style="@style/Widget.XimcaClinic.TextInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="Fecha de nacimiento (dd/mm/aaaa) *">
+                android:hint="Fecha de nacimiento *"
+                app:endIconMode="custom"
+                app:endIconDrawable="@drawable/ic_calendar"
+                app:endIconContentDescription="Seleccionar fecha">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etFechaNacimiento"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:maxLength="10" />
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Peso y Estatura lado a lado -->

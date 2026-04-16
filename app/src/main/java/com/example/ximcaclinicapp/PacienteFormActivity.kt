@@ -11,6 +11,9 @@ import com.example.ximcaclinicapp.data.Paciente
 import com.example.ximcaclinicapp.databinding.ActivityPacienteFormBinding
 import com.example.ximcaclinicapp.utils.CalculosMedico
 import com.example.ximcaclinicapp.utils.PacienteValidator
+import com.google.android.material.datepicker.MaterialDatePicker
+import java.util.Calendar
+import java.util.TimeZone
 
 class PacienteFormActivity : AppCompatActivity() {
 
@@ -41,7 +44,7 @@ class PacienteFormActivity : AppCompatActivity() {
             binding.toggleEstado.check(R.id.btnEstadoEspera) // estado por defecto
         }
 
-        configurarFormatoFecha()
+        configurarFechaPicker()
         configurarCalculoImc()
         binding.btnGuardar.setOnClickListener { guardarPaciente() }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -63,32 +66,23 @@ class PacienteFormActivity : AppCompatActivity() {
         }
     }
 
-    private fun configurarFormatoFecha() {
-        var isFormatting = false
-        binding.etFechaNacimiento.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                if (isFormatting || s == null) return
-                isFormatting = true
-
-                // Extraer solo dígitos, máximo 8 (ddmmaaaa)
-                val digits = s.toString().filter { it.isDigit() }.take(8)
-
-                // Reconstruir con barras: dd/mm/aaaa
-                val result = StringBuilder()
-                for (i in digits.indices) {
-                    result.append(digits[i])
-                    // Solo agregar '/' si hay más dígitos por venir (evita barra flotante)
-                    if ((i == 1 || i == 3) && i < digits.lastIndex) {
-                        result.append('/')
-                    }
-                }
-
-                s.replace(0, s.length, result.toString())
-                isFormatting = false
+    private fun configurarFechaPicker() {
+        val abrirPicker = View.OnClickListener {
+            val picker = MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Fecha de nacimiento")
+                .build()
+            picker.addOnPositiveButtonClickListener { millis ->
+                val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+                cal.timeInMillis = millis
+                val dd   = String.format("%02d", cal.get(Calendar.DAY_OF_MONTH))
+                val mm   = String.format("%02d", cal.get(Calendar.MONTH) + 1)
+                val yyyy = cal.get(Calendar.YEAR)
+                binding.etFechaNacimiento.setText("$dd/$mm/$yyyy")
             }
-        })
+            picker.show(supportFragmentManager, "fecha_picker")
+        }
+        binding.etFechaNacimiento.setOnClickListener(abrirPicker)
+        binding.tilFechaNacimiento.setEndIconOnClickListener(abrirPicker)
     }
 
     private fun configurarCalculoImc() {
