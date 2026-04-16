@@ -10,12 +10,10 @@ import com.example.ximcaclinicapp.databinding.ActivityPacienteDetailBinding
 import com.example.ximcaclinicapp.utils.CalculosMedico
 import com.example.ximcaclinicapp.viewmodel.PacienteViewModel
 import com.example.ximcaclinicapp.R
-import dagger.hilt.android.AndroidEntryPoint
 
 // Esta pantalla muestra TODOS los datos de un paciente específico.
 // Llego aquí desde PacienteListActivity cuando toco una tarjeta.
 // Desde aquí puedo editar o eliminar al paciente.
-@AndroidEntryPoint
 class PacienteDetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPacienteDetailBinding

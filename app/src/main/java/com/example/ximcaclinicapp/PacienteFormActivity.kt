@@ -27,6 +27,7 @@ class PacienteFormActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityPacienteFormBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
 
         pacienteId = intent.getIntExtra("id", -1)
 

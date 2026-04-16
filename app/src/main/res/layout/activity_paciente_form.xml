@@ -36,8 +36,10 @@
         android:layout_height="wrap_content"
         android:background="@color/md_theme_light_surface"
         android:fontFamily="sans-serif-medium"
-        android:paddingHorizontal="24dp"
-        android:paddingVertical="12dp"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
         android:text="Nuevo Paciente"
         android:textColor="@color/text_primary"
         android:textSize="20sp"
@@ -53,7 +55,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="24dp"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
             android:paddingTop="16dp"
             android:paddingBottom="8dp">
 
@@ -214,8 +217,10 @@
         android:layout_height="wrap_content"
         android:background="@color/md_theme_light_surface"
         android:elevation="6dp"
-        android:paddingHorizontal="24dp"
-        android:paddingVertical="12dp">
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp">
 
         <Button
             android:id="@+id/btnGuardar"

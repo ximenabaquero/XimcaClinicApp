@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.ximcaclinicapp.R
 import com.example.ximcaclinicapp.data.Paciente
 import com.example.ximcaclinicapp.databinding.ItemPacienteBinding
 import com.example.ximcaclinicapp.utils.CalculosMedico
@@ -46,6 +47,15 @@ class PacienteAdapter(
         fun bind(paciente: Paciente) {
             binding.tvNombrePaciente.text = "${paciente.nombre} ${paciente.apellido}"
             binding.tvEstadoPaciente.text = paciente.estado
+
+            // Badge de color según el estado del paciente
+            val (bgRes, textColorRes) = when (paciente.estado) {
+                "EN_CONSULTA" -> Pair(R.drawable.bg_badge_en_consulta, R.color.status_en_consulta_text)
+                "ALTA"        -> Pair(R.drawable.bg_badge_alta, R.color.status_alta_text)
+                else          -> Pair(R.drawable.bg_badge_en_espera, R.color.status_en_espera_text)
+            }
+            binding.tvEstadoPaciente.setBackgroundResource(bgRes)
+            binding.tvEstadoPaciente.setTextColor(binding.root.context.getColor(textColorRes))
 
             // Calculo el nivel de peso para mostrarlo junto al IMC
             val nivel = CalculosMedico.obtenerNivelPeso(paciente.imc)

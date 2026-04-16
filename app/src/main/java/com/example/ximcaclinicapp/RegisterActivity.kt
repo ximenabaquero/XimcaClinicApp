@@ -5,29 +5,27 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.ximcaclinicapp.data.AppDatabase
 import com.example.ximcaclinicapp.data.Usuario
 import com.example.ximcaclinicapp.data.UsuarioDao
 import com.example.ximcaclinicapp.databinding.ActivityRegisterBinding
 import com.example.ximcaclinicapp.utils.PasswordUtils
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 // RegisterActivity es la pantalla donde el médico crea su cuenta.
 // Solo se llega aquí desde el link en LoginActivity.
-@AndroidEntryPoint
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityRegisterBinding
-
-    // Hilt inyecta el DAO automáticamente, igual que en LoginActivity
-    @Inject
-    lateinit var usuarioDao: UsuarioDao
+    private lateinit var usuarioDao: UsuarioDao
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Inicializamos el DAO desde la base de datos Singleton, igual que en LoginActivity
+        usuarioDao = AppDatabase.getDatabase(this).usuarioDao()
 
         binding.btnRegistrar.setOnClickListener {
             val nombre = binding.etNombre.text.toString().trim()

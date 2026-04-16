@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.example.ximcaclinicapp"
-    compileSdk = 35 // Bajamos a 35 por estabilidad
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.ximcaclinicapp"

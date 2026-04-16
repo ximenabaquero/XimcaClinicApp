@@ -8,8 +8,8 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.ximcaclinicapp.databinding.ActivityPacienteListBinding
-import com.example.ximcaclinicapp.ui.PacienteAdapter
-import com.example.ximcaclinicapp.viewmodel.PacienteViewModel
+import com.example.ximcaclinicapp.PacienteAdapter
+import com.example.ximcaclinicapp.PacienteViewModel
 
 class PacienteListActivity : AppCompatActivity() {
 
@@ -49,6 +49,7 @@ class PacienteListActivity : AppCompatActivity() {
             }
         )
 
+        setSupportActionBar(binding.toolbar)
         binding.recyclerViewPacientes.layoutManager = LinearLayoutManager(this)
         binding.recyclerViewPacientes.adapter = adapter
 
