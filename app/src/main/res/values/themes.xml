@@ -89,7 +89,7 @@
     </style>
 
     <!-- Overlay que garantiza texto oscuro dentro de cualquier TextInputLayout -->
-    <style name="ThemeOverlay.XimcaClinic.TextInput">
+    <style name="ThemeOverlay.XimcaClinic.TextInput" parent="ThemeOverlay.Material3">
         <item name="android:textColorPrimary">@color/text_primary</item>
         <item name="android:textColor">@color/text_primary</item>
     </style>
