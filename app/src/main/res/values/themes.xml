@@ -84,6 +84,14 @@
         <item name="boxCornerRadiusTopEnd">@dimen/corner_md</item>
         <item name="boxCornerRadiusBottomStart">@dimen/corner_md</item>
         <item name="boxCornerRadiusBottomEnd">@dimen/corner_md</item>
+        <!-- Fuerza color de texto en todos los campos, incluso en Samsung One UI -->
+        <item name="materialThemeOverlay">@style/ThemeOverlay.XimcaClinic.TextInput</item>
+    </style>
+
+    <!-- Overlay que garantiza texto oscuro dentro de cualquier TextInputLayout -->
+    <style name="ThemeOverlay.XimcaClinic.TextInput">
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColor">@color/text_primary</item>
     </style>
 
     <!-- Login specific: white outlined inputs -->
