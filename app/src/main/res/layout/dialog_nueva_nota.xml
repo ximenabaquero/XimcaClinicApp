@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:background="@color/md_theme_light_surface"
     android:paddingStart="24dp"
     android:paddingEnd="24dp"
     android:paddingTop="8dp"
@@ -22,8 +23,10 @@
             android:layout_height="wrap_content"
             android:gravity="top"
             android:inputType="textMultiLine|textCapSentences"
+            android:maxLength="500"
+            android:maxLines="10"
             android:minLines="4"
-            android:maxLines="10" />
+            android:textColor="@color/text_primary" />
     </com.google.android.material.textfield.TextInputLayout>
 
 </LinearLayout>

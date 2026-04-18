@@ -1,9 +1,11 @@
 package com.example.ximcaclinicapp
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.ximcaclinicapp.data.Nota
 import com.example.ximcaclinicapp.databinding.ActivityNotasBinding
@@ -55,10 +57,12 @@ class NotasActivity : AppCompatActivity() {
     }
 
     private fun mostrarDialogoNuevaNota() {
-        val dialogView = layoutInflater.inflate(R.layout.dialog_nueva_nota, null)
+        // Forzamos tema claro para que el diálogo no herede el modo oscuro de Samsung
+        val lightContext = ContextThemeWrapper(this, R.style.Theme_XimcaClinicApp)
+        val dialogView = LayoutInflater.from(lightContext).inflate(R.layout.dialog_nueva_nota, null)
         val et = dialogView.findViewById<TextInputEditText>(R.id.etNotaDialog)
 
-        MaterialAlertDialogBuilder(this)
+        MaterialAlertDialogBuilder(lightContext)
             .setTitle("Nueva nota")
             .setView(dialogView)
             .setPositiveButton("Guardar") { _, _ ->
