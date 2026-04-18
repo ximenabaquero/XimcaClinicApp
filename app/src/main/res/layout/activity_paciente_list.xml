@@ -23,7 +23,28 @@
             app:titleTextColor="@color/text_primary"
             app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge" />
 
-        <!-- Divider sutil bajo el toolbar -->
+        <!-- Barra de búsqueda -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilBuscar"
+            style="@style/Widget.XimcaClinic.TextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:hint="Buscar por nombre o apellido..."
+            app:startIconDrawable="@drawable/ic_search">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etBuscar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:imeOptions="actionSearch" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Divider sutil bajo la búsqueda -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"

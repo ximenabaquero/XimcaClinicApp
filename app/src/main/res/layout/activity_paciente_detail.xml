@@ -82,7 +82,7 @@
                     android:layout_marginTop="12dp"
                     android:background="@color/divider" />
 
-                <!-- Fecha de nacimiento -->
+                <!-- Teléfono -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -93,18 +93,64 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Fecha de nacimiento"
+                        android:text="Teléfono"
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
 
                     <TextView
-                        android:id="@+id/tvFechaNacimiento"
+                        android:id="@+id/tvTelefono"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="--/--/----"
+                        android:text="--"
                         android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:textStyle="bold" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="#F5F5F5" />
+
+                <!-- Fecha de nacimiento + Edad -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Fecha de nacimiento"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="14sp" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="end"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvFechaNacimiento"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="--/--/----"
+                            android:textColor="@color/text_primary"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvEdad"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="-- años"
+                            android:textColor="@color/md_theme_light_primary"
+                            android:textSize="12sp" />
+                    </LinearLayout>
                 </LinearLayout>
 
                 <View

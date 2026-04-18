@@ -25,5 +25,6 @@ data class Paciente(
 
     // Estos dos tienen valor por defecto para que no sean obligatorios al crear
     val antecedentes: String = "",       // Enfermedades previas, alergias, etc.
-    val estado: String = "EN_ESPERA"    // Estado actual: EN_ESPERA, EN_CONSULTA o ALTA
+    val estado: String = "EN_ESPERA",   // Estado actual: EN_ESPERA, EN_CONSULTA o ALTA
+    val telefono: String = ""           // Teléfono de contacto (opcional)
 )

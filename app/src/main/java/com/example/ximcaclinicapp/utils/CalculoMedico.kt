@@ -25,6 +25,31 @@ object CalculosMedico {
         obtenerClasificacionCirugiaPlastica(imc).categoria
 
     /**
+     * Calcula la edad en años a partir de una fecha en formato "dd/MM/yyyy".
+     * Devuelve "-- años" si la fecha no es válida.
+     */
+    fun calcularEdad(fechaNacimiento: String): String {
+        return try {
+            val partes = fechaNacimiento.split("/")
+            if (partes.size != 3) return "-- años"
+            val dia  = partes[0].trim().toInt()
+            val mes  = partes[1].trim().toInt()
+            val anio = partes[2].trim().toInt()
+
+            val hoy        = Calendar.getInstance()
+            val nacimiento = Calendar.getInstance().apply { set(anio, mes - 1, dia) }
+
+            var edad = hoy.get(Calendar.YEAR) - nacimiento.get(Calendar.YEAR)
+            // Ajuste si aún no ha llegado el cumpleaños este año
+            if (hoy.get(Calendar.DAY_OF_YEAR) < nacimiento.get(Calendar.DAY_OF_YEAR)) edad--
+
+            "$edad años"
+        } catch (e: Exception) {
+            "-- años"
+        }
+    }
+
+    /**
      * Clasificación de IMC para Consultorio de Cirugía Plástica.
      * Basado en criterios OMS y clasificación quirúrgica estándar (ASA/Clasificación de Obesidad).
      */

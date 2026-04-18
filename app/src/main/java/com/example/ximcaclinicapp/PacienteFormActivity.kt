@@ -54,6 +54,7 @@ class PacienteFormActivity : AppCompatActivity() {
         binding.etNombre.setText(intent.getStringExtra("nombre"))
         binding.etApellido.setText(intent.getStringExtra("apellido"))
         binding.etFechaNacimiento.setText(intent.getStringExtra("fechaNacimiento"))
+        binding.etTelefono.setText(intent.getStringExtra("telefono"))
         binding.etPeso.setText(intent.getDoubleExtra("peso", 0.0).toString())
         binding.etEstatura.setText(intent.getDoubleExtra("estatura", 0.0).toString())
         binding.etImc.setText(intent.getDoubleExtra("imc", 0.0).toString())
@@ -151,6 +152,7 @@ class PacienteFormActivity : AppCompatActivity() {
             nombre = binding.etNombre.text.toString().trim(),
             apellido = binding.etApellido.text.toString().trim(),
             fechaNacimiento = binding.etFechaNacimiento.text.toString().trim(),
+            telefono = binding.etTelefono.text.toString().trim(),
             peso = peso,
             estatura = estatura,
             imc = CalculosMedico.calcularIMC(peso, estatura),

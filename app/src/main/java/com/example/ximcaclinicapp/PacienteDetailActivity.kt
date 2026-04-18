@@ -35,6 +35,7 @@ class PacienteDetailActivity : AppCompatActivity() {
             nombre = intent.getStringExtra("nombre") ?: "",
             apellido = intent.getStringExtra("apellido") ?: "",
             fechaNacimiento = intent.getStringExtra("fechaNacimiento") ?: "",
+            telefono = intent.getStringExtra("telefono") ?: "",
             peso = intent.getDoubleExtra("peso", 0.0),
             estatura = intent.getDoubleExtra("estatura", 0.0),
             imc = intent.getDoubleExtra("imc", 0.0),
@@ -64,6 +65,7 @@ class PacienteDetailActivity : AppCompatActivity() {
                 putExtra("peso", paciente.peso)
                 putExtra("estatura", paciente.estatura)
                 putExtra("imc", paciente.imc)
+                putExtra("telefono", paciente.telefono)
                 putExtra("antecedentes", paciente.antecedentes)
                 putExtra("estado", paciente.estado)
             }
@@ -102,7 +104,9 @@ class PacienteDetailActivity : AppCompatActivity() {
         binding.tvEstado.setBackgroundResource(bgRes)
         binding.tvEstado.setTextColor(getColor(textColorRes))
 
+        binding.tvTelefono.text = paciente.telefono.ifEmpty { "No registrado" }
         binding.tvFechaNacimiento.text = paciente.fechaNacimiento
+        binding.tvEdad.text = CalculosMedico.calcularEdad(paciente.fechaNacimiento)
         binding.tvPeso.text = "${paciente.peso} kg"
         binding.tvEstatura.text = "${paciente.estatura} m"
 
