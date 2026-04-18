@@ -31,20 +31,21 @@
                 android:paddingTop="48dp"
                 android:paddingBottom="32dp">
 
-                <ImageView
-                    android:layout_width="72dp"
-                    android:layout_height="72dp"
-                    android:src="@drawable/ic_launcher_foreground"
-                    app:tint="@android:color/white" />
-
-                <TextView
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="Ximca Clinic"
-                    android:textColor="@android:color/white"
-                    android:textSize="24sp" />
+                    app:cardBackgroundColor="@android:color/white"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="8dp">
+
+                    <ImageView
+                        android:layout_width="130dp"
+                        android:layout_height="130dp"
+                        android:adjustViewBounds="true"
+                        android:padding="8dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_ximka_logo" />
+                </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
             <!-- Tarjeta blanca con formulario de registro -->
