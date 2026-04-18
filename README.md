@@ -1,234 +1,217 @@
-# XimcaClinicApp 🏥
+# Ximka — Sistema de Gestión Clínica
 
-Aplicación Android nativa para gestión de pacientes en una clínica médica.
-Desarrollada en Kotlin con arquitectura MVVM, Room y Material Design 3.
+Aplicación Android nativa para la gestión de pacientes de un consultorio de cirugía plástica.
+Permite registrar médicos, iniciar sesión y administrar pacientes con CRUD completo, notas clínicas, cálculo automático de IMC y clasificación quirúrgica.
 
 ---
 
-## ¿Cómo compilar y correr el proyecto?
+## Cómo compilar y ejecutar
 
-### Requisitos previos
-| Herramienta | Versión mínima |
+| Parámetro | Valor |
 |---|---|
 | Android Studio | Hedgehog 2023.1.1 o superior |
-| Kotlin | 1.9+ |
-| Compile SDK | 34 (Android 14) |
-| Min SDK | 24 (Android 7.0) |
-| Target SDK | 34 |
-| JDK | 1.8 |
+| compileSdk | 36 |
+| targetSdk | 35 |
+| minSdk | 24 (Android 7.0) |
+| Lenguaje | Kotlin |
+| JDK | 17 |
 
-### Pasos para ejecutar
+**Pasos:**
+1. Clonar o descomprimir el proyecto
+2. Abrir Android Studio → *Open an existing project* → seleccionar la carpeta `XimcaClinicApp`
+3. Esperar que Gradle sincronice (barra de progreso en la parte inferior)
+4. Conectar un dispositivo o iniciar un emulador API 24+
+5. Presionar **Run ▶** (`Shift + F10`)
 
-1. Clona o descarga el repositorio:
-   ```
-   git clone https://github.com/ximenabaquero/XimcaClinicApp.git
-   ```
-2. Abre Android Studio → **File → Open** → selecciona la carpeta `XimcaClinicApp`.
-3. Espera a que Gradle sincronice las dependencias (barra de progreso abajo).
-4. Conecta un dispositivo Android o inicia un emulador (API 24+).
-5. Presiona **Run ▶** o usa el atajo `Shift + F10`.
-
-> **Nota:** La carpeta `/build` está excluida del repositorio para reducir el tamaño del ZIP.
+> La carpeta `/build` está excluida del repositorio para reducir el tamaño del ZIP.
 
 ---
 
-## Descripción del proyecto
+## Dominio elegido
 
-**Dominio elegido:** Clínica médica — gestión de pacientes.
-
-La app permite a un médico registrarse, iniciar sesión y gestionar la lista completa de sus pacientes (crear, ver, editar y eliminar), con cálculo automático del IMC y clasificación del estado de salud.
+**Clínica de cirugía plástica.** La entidad principal es `Paciente`, que almacena datos clínicos relevantes para el contexto quirúrgico: peso, estatura, IMC calculado, clasificación de riesgo y notas médicas.
 
 ---
 
-## Cumplimiento de requisitos del proyecto
+## Cumplimiento de requisitos funcionales
 
-### Vistas implementadas (6 vistas — mínimo requerido: 4)
+### 1. Login y Registro ✅
 
-| # | Vista | Activity | Descripción |
-|---|---|---|---|
-| 1 | **Login** | `LoginActivity` | Formulario con validación de email y contraseña |
-| 2 | **Registro** | `RegisterActivity` | Crear cuenta de médico con validaciones |
-| 3 | **Dashboard** | `MainActivity` | Pantalla principal post-login con datos del médico y logout |
-| 4 | **Lista de pacientes** | `PacienteListActivity` | RecyclerView con todos los pacientes, botón eliminar y FAB para crear |
-| 5 | **Detalle del paciente** | `PacienteDetailActivity` | Todos los datos del paciente, botones editar y eliminar |
-| 6 | **Formulario crear/editar** | `PacienteFormActivity` | Formulario con validación, cálculo automático de IMC, doble modo (crear y editar) |
+**Pantallas:** `LoginActivity` y `RegisterActivity`
 
----
+El médico puede crear su cuenta desde la pantalla de registro y luego iniciar sesión. La app valida los datos antes de consultar la base de datos.
 
-### Autenticación ✅
+**Validaciones implementadas:**
 
-| Requisito del profesor | Implementación |
+| Campo | Regla |
 |---|---|
-| Registro local con validación | `RegisterActivity`: nombre obligatorio, email debe contener `@`, contraseña ≥ 6 caracteres |
-| Login local con validación | `LoginActivity`: verifica campos vacíos y formato de email antes de consultar la BD |
-| Persistencia de sesión | `SharedPreferences` guarda `userId`, `userName`, `userEmail`, `userRol` al iniciar sesión |
-| Sesión activa al reabrir | `LoginActivity` revisa si ya hay sesión guardada y redirige al dashboard automáticamente |
-| Cerrar sesión | `MainActivity` limpia `SharedPreferences` con `.clear()` y redirige al login |
+| Nombre (registro) | No puede estar vacío |
+| Correo | No vacío + debe contener `@` |
+| Contraseña | Mínimo 6 caracteres |
+
+- Los errores se muestran directamente debajo de cada campo con `TextInputLayout.error`
+- La contraseña se almacena con hash **SHA-256** (nunca en texto plano)
+- Al iniciar sesión correctamente, los datos del médico se guardan en `SharedPreferences` (`userId`, `userName`, `userEmail`, `userRol`)
+- Si ya hay sesión activa, la app salta el login automáticamente
+- El botón "Salir" en el dashboard limpia la sesión y regresa al login
+- `ProgressBar` visible mientras se procesa la solicitud; botón deshabilitado para evitar doble envío
 
 ---
 
-### CRUD completo sobre `Paciente` ✅
+### 2. CRUD completo sobre Paciente ✅
 
-| Operación | Dónde ocurre |
+**Entidad:** `Paciente` — nombre, apellido, fecha de nacimiento, teléfono, peso, estatura, IMC, antecedentes, estado
+
+| Operación | Cómo se hace |
 |---|---|
-| **Crear** | `PacienteFormActivity` → `viewModel.insert()` → `PacienteRepository` → `PacienteDao.insertPaciente()` |
-| **Leer (listar)** | `PacienteListActivity` observa `viewModel.allPacientes` (LiveData que viene de un Flow de Room) |
-| **Leer (detalle)** | `PacienteDetailActivity` recibe los datos por Intent extras |
-| **Actualizar** | `PacienteFormActivity` en modo edición → `viewModel.update()` → `PacienteDao.updatePaciente()` |
-| **Eliminar** | Desde `PacienteListActivity` o `PacienteDetailActivity` → `viewModel.delete()` con AlertDialog de confirmación |
-| **Actualización reactiva** | Room retorna un `Flow<List<Paciente>>` convertido a `LiveData`; la UI se actualiza sola sin reiniciar la app |
+| **Crear** | FAB `+` en la lista → `PacienteFormActivity` en modo "Nuevo Paciente" → `viewModel.insert()` |
+| **Leer** | `PacienteListActivity` con `RecyclerView` que observa `allPacientes` (LiveData) |
+| **Actualizar** | Botón "Editar" en el detalle → mismo formulario en modo "Editar Paciente" → `viewModel.update()` |
+| **Eliminar** | Botón "✕" en la tarjeta o "Eliminar" en el detalle → `AlertDialog` de confirmación → `viewModel.delete()` |
+
+La lista se **actualiza sola** al crear, editar o eliminar gracias a `Room Flow → LiveData → RecyclerView`. No es necesario recargar la app.
+
+**Extras implementados:**
+- IMC calculado automáticamente mientras se escribe peso/estatura (TextWatcher en tiempo real)
+- Clasificación quirúrgica del IMC con nota clínica para el médico
+- Selector de fecha con calendario visual (`MaterialDatePicker`)
+- Edad calculada automáticamente desde la fecha de nacimiento
+- Búsqueda de pacientes por nombre o apellido en tiempo real
+- Módulo de notas clínicas por paciente con fecha y hora automática (`NotasActivity`)
+- Estados del paciente: En Espera / En Consulta / Alta (con badge de color)
+- Estadísticas en tiempo real en el dashboard (total, por estado)
 
 ---
 
-### Navegación e interacción ✅
+### 3. Vistas con interacción observable ✅
 
-| Requisito | Implementación |
-|---|---|
-| Paso de datos entre vistas | `Intent.putExtra()` / `intent.getExtra()` entre List → Detail → Form |
-| Botón "volver" | `supportActionBar?.setDisplayHomeAsUpEnabled(true)` + `onSupportNavigateUp()` en todas las vistas CRUD |
-| Back-stack coherente | `finish()` en el momento correcto para que el stack no acumule pantallas innecesarias |
-| Mensajes de error en campos | `TextInputLayout.error` muestra el error justo debajo del campo que falla |
-| Mensajes de éxito | `Toast` al guardar, actualizar o registrar exitosamente |
-| Confirmación al eliminar | `AlertDialog` pregunta "¿Seguro que deseas eliminar?" antes de borrar |
+La app cuenta con **7 pantallas**, superando el mínimo de 4 requeridas:
+
+| # | Activity | Descripción |
+|---|---|---|
+| 1 | `LoginActivity` | Inicio de sesión con validación |
+| 2 | `RegisterActivity` | Registro de nuevo médico |
+| 3 | `MainActivity` | Dashboard: datos del médico y estadísticas |
+| 4 | `PacienteListActivity` | Lista con RecyclerView, búsqueda y FAB |
+| 5 | `PacienteDetailActivity` | Detalle completo del paciente y acciones |
+| 6 | `PacienteFormActivity` | Formulario de crear/editar con validaciones |
+| 7 | `NotasActivity` | Notas clínicas del paciente |
+
+---
+
+### 4. Navegación e interacción ✅
+
+- Datos enviados entre pantallas con `Intent.putExtra()` / `intent.getExtra()`
+- Botón de regreso funcional (`onSupportNavigateUp`) en todas las pantallas CRUD
+- Back-stack coherente: al editar, se cierra el detalle para evitar acumulación de pantallas
+- Animaciones de transición (`slide_in_left`, `fade_in`)
+- `Toast` para confirmar acciones exitosas
+- `AlertDialog` antes de eliminar cualquier registro
+- Estado vacío visible cuando no hay pacientes ni notas
 
 ---
 
 ## Arquitectura: MVVM
 
+Se utilizó el patrón **MVVM (Model – View – ViewModel)** con Repository, recomendado por Android Jetpack para aplicaciones nativas en Kotlin.
+
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                         UI LAYER                            │
-│   LoginActivity  RegisterActivity  MainActivity             │
-│   PacienteListActivity  PacienteDetailActivity              │
-│   PacienteFormActivity  PacienteAdapter                     │
-└───────────────────────┬─────────────────────────────────────┘
-                        │  observa LiveData / llama funciones
-┌───────────────────────▼─────────────────────────────────────┐
-│                     VIEWMODEL LAYER                         │
-│   PacienteViewModel                                         │
-│   - allPacientes: LiveData<List<Paciente>>                  │
-│   - insert() / update() / delete()  (viewModelScope)        │
-└───────────────────────┬─────────────────────────────────────┘
-                        │  delega operaciones
-┌───────────────────────▼─────────────────────────────────────┐
-│                    REPOSITORY LAYER                         │
-│   PacienteRepository                                        │
-│   - allPacientes: Flow<List<Paciente>>                      │
-│   - insert() / update() / delete() / getById()             │
-└───────────────────────┬─────────────────────────────────────┘
-                        │  consulta la BD
-┌───────────────────────▼─────────────────────────────────────┐
-│                      DATA LAYER                             │
-│   AppDatabase (Room Singleton)                              │
-│   PacienteDao  ─────────────────  Paciente (@Entity)        │
-│   UsuarioDao   ─────────────────  Usuario  (@Entity)        │
-└─────────────────────────────────────────────────────────────┘
+Activity / Layout  →  observa LiveData
+        ↕
+    ViewModel      →  ejecuta lógica en viewModelScope (coroutines)
+        ↕
+   Repository      →  abstrae la fuente de datos
+        ↕
+      DAO           →  consultas SQL con Room
+        ↕
+  Base de datos SQLite (Room)
 ```
 
-### Justificación de MVVM
+**¿Por qué MVVM?**
 
-Se eligió **MVVM (Model-View-ViewModel)** porque:
+- Las `Activities` no tocan la base de datos. Solo observan datos y reaccionan a cambios.
+- El `ViewModel` sobrevive a rotaciones de pantalla, evitando perder el estado.
+- El `Repository` separa la fuente de datos de la lógica de presentación.
+- `LiveData` garantiza que la UI siempre muestre el estado actual sin consultas manuales.
+- Las operaciones de base de datos se ejecutan en segundo plano con `viewModelScope.launch`, sin bloquear la pantalla.
 
-- **Separación de responsabilidades:** la Activity solo maneja la UI; el ViewModel maneja la lógica de presentación; el Repository maneja el acceso a datos.
-- **Supervivencia a cambios de configuración:** el ViewModel sobrevive a rotaciones de pantalla, evitando pérdida de datos.
-- **Reactividad:** `Flow` + `LiveData` actualizan la lista automáticamente sin necesidad de recargar manualmente.
-- **Testabilidad:** el ViewModel y el Repository se pueden probar de forma independiente.
-- **Es el patrón recomendado** por Android Jetpack para aplicaciones modernas en Kotlin.
+| Clase | Capa | Responsabilidad |
+|---|---|---|
+| `LoginActivity`, `PacienteListActivity`, etc. | View | UI y eventos del usuario |
+| `PacienteViewModel`, `NotaViewModel` | ViewModel | LiveData, lógica de presentación, coroutines |
+| `PacienteRepository` | Repository | Intermediario ViewModel ↔ DAO |
+| `PacienteDao`, `NotaDao`, `UsuarioDao` | DAO | Consultas SQL con Room |
+| `AppDatabase` | Model | Configuración de Room y migraciones |
 
 ---
 
-## Esquema de datos
+## Persistencia local: Room
+
+Se usa **Room** como capa de abstracción sobre SQLite, con tres entidades:
 
 ### Tabla `usuarios`
-| Campo | Tipo | Descripción |
+| Campo | Tipo | Notas |
 |---|---|---|
-| `id` | INT (PK, autoincrement) | Identificador único |
-| `nombre` | TEXT | Nombre completo del médico |
-| `email` | TEXT | Correo electrónico (usado para login) |
-| `password` | TEXT | Contraseña (mínimo 6 caracteres) |
-| `rol` | TEXT | Rol del usuario (default: `"MÉDICO"`) |
+| id | INTEGER PK | Autogenerado |
+| nombre | TEXT | Nombre del médico |
+| email | TEXT | Correo de acceso |
+| password | TEXT | Hash SHA-256 |
+| rol | TEXT | "MÉDICO" por defecto |
 
 ### Tabla `pacientes`
-| Campo | Tipo | Descripción |
+| Campo | Tipo | Notas |
 |---|---|---|
-| `id` | INT (PK, autoincrement) | Identificador único |
-| `nombre` | TEXT | Nombre del paciente |
-| `apellido` | TEXT | Apellido del paciente |
-| `fechaNacimiento` | TEXT | Fecha en formato `dd/mm/aaaa` |
-| `peso` | REAL | Peso en kilogramos |
-| `estatura` | REAL | Estatura en metros |
-| `imc` | REAL | Índice de Masa Corporal (calculado automáticamente) |
-| `antecedentes` | TEXT | Historial médico (opcional) |
-| `estado` | TEXT | Estado: `EN_ESPERA`, `EN_CONSULTA` o `ALTA` |
+| id | INTEGER PK | Autogenerado |
+| nombre | TEXT | — |
+| apellido | TEXT | — |
+| fechaNacimiento | TEXT | dd/MM/yyyy |
+| telefono | TEXT | Opcional |
+| peso | REAL | En kg |
+| estatura | REAL | En metros |
+| imc | REAL | Calculado: peso / estatura² |
+| antecedentes | TEXT | Opcional |
+| estado | TEXT | EN_ESPERA / EN_CONSULTA / ALTA |
+
+### Tabla `notas`
+| Campo | Tipo | Notas |
+|---|---|---|
+| id | INTEGER PK | Autogenerado |
+| pacienteId | INTEGER | Referencia al paciente |
+| texto | TEXT | Contenido de la nota |
+| fechaCreacion | TEXT | dd/MM/yyyy · HH:mm |
+
+**Migraciones implementadas** (los datos no se pierden al actualizar):
+- v1 → v2: creación de la tabla `notas`
+- v2 → v3: columna `telefono` agregada a `pacientes` con `ALTER TABLE`
 
 ---
 
-## Validaciones implementadas
+## UI/UX y accesibilidad
 
-### Registro (`RegisterActivity`)
-- Nombre no puede estar vacío
-- Email debe contener `@`
-- Contraseña debe tener al menos **6 caracteres**
-- Los errores se muestran debajo del campo con `TextInputLayout.error`
-
-### Login (`LoginActivity`)
-- Email no puede estar vacío
-- Email debe contener `@`
-- Contraseña no puede estar vacía
-
-### Formulario de paciente (`PacienteFormActivity`)
-- Nombre y apellido obligatorios
-- Fecha de nacimiento obligatoria
-- Peso debe ser un número positivo
-- Estatura debe ser un número positivo (en metros, ej: `1.70`)
-- IMC se calcula automáticamente con `TextWatcher` (no editable)
+- Diseño con **Material Design 3** (paleta azul médico + verde clínico)
+- Todos los campos con `TextInputLayout` con bordes redondeados y hints flotantes
+- Botones con altura mínima de 52dp (mayor a los 40dp requeridos para accesibilidad táctil)
+- Badges de color por estado del paciente (ámbar / azul / verde)
+- Contraste adecuado: textos oscuros sobre fondos blancos/claros
+- Estados vacíos con mensaje orientador cuando no hay datos
+- FAB visible en lista de pacientes y notas
+- Campos de solo lectura no confundibles con editables (IMC, fecha)
+- Selector de fecha visual con `MaterialDatePicker` (evita errores de formato manual)
 
 ---
 
-## Flujo de la aplicación
+## Flujo a demostrar
 
-```
-[App abre]
-    │
-    ▼
-¿Hay sesión guardada?
-    │
-    ├── SÍ → MainActivity (dashboard)
-    │             │
-    │             ├── "Ver Pacientes" → PacienteListActivity
-    │             │         │
-    │             │         ├── Tocar tarjeta → PacienteDetailActivity
-    │             │         │         ├── "Editar" → PacienteFormActivity (modo edición)
-    │             │         │         └── "Eliminar" → AlertDialog → regresa a lista
-    │             │         │
-    │             │         └── FAB "+" → PacienteFormActivity (modo creación)
-    │             │
-    │             └── "Cerrar Sesión" → LoginActivity
-    │
-    └── NO → LoginActivity
-                  │
-                  ├── Login correcto → MainActivity
-                  └── "Regístrate" → RegisterActivity → LoginActivity
-```
-
----
-
-## Dependencias principales
-
-```kotlin
-// Base de datos local
-implementation("androidx.room:room-runtime:2.6.1")
-implementation("androidx.room:room-ktx:2.6.1")       // Flow + coroutines
-kapt("androidx.room:room-compiler:2.6.1")
-
-// ViewModel + LiveData (arquitectura MVVM)
-implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
-implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
-
-// UI
-implementation("com.google.android.material:material:...")  // Material Design 3
-implementation("androidx.constraintlayout:constraintlayout:...")
-```
+1. Abrir la app → pantalla de **Login**
+2. Tocar "¿No tienes cuenta?" → **Registro** → crear médico → volver al login
+3. Iniciar sesión → **Dashboard** con estadísticas
+4. Tocar "Ver Pacientes" → lista vacía
+5. FAB `+` → **Formulario nuevo paciente** → llenar datos → guardar → aparece en la lista
+6. Tocar la tarjeta → **Detalle** → ver datos completos, IMC y clasificación quirúrgica
+7. Tocar "Editar" → modificar un dato → guardar → el cambio se refleja en lista y detalle
+8. Tocar "Ver notas" → **Notas** → agregar nota → aparece con fecha y hora
+9. Volver al detalle → "Eliminar" → confirmar → la lista se actualiza
+10. Volver al dashboard → "Salir" → sesión cerrada → regresa al login
 
 ---
 
@@ -238,33 +221,34 @@ implementation("androidx.constraintlayout:constraintlayout:...")
 app/src/main/
 ├── java/com/example/ximcaclinicapp/
 │   ├── data/
-│   │   ├── Paciente.kt           ← @Entity tabla pacientes
-│   │   ├── PacienteDao.kt        ← CRUD + Flow para Room
-│   │   ├── PacienteRepository.kt ← intermediario ViewModel ↔ DAO
-│   │   ├── Usuario.kt            ← @Entity tabla usuarios
-│   │   ├── UsuarioDao.kt         ← login + registro
-│   │   └── AppDatabase.kt        ← Singleton RoomDatabase
+│   │   ├── Paciente.kt              @Entity - tabla pacientes
+│   │   ├── PacienteDao.kt           CRUD + Flow
+│   │   ├── PacienteRepository.kt    capa intermedia ViewModel ↔ DAO
+│   │   ├── Nota.kt                  @Entity - tabla notas
+│   │   ├── NotaDao.kt               insert/delete/query notas
+│   │   ├── Usuario.kt               @Entity - tabla usuarios
+│   │   ├── UsuarioDao.kt            login + registro
+│   │   └── AppDatabase.kt           Singleton Room + migraciones
 │   ├── utils/
-│   │   └── CalculoMedico.kt      ← cálculo IMC y clasificación OMS
-│   ├── PacienteViewModel.kt      ← LiveData + operaciones CRUD
-│   ├── PacienteAdapter.kt        ← RecyclerView ListAdapter
-│   ├── LoginActivity.kt          ← vista 1: autenticación
-│   ├── RegisterActivity.kt       ← vista 2: registro
-│   ├── MainActivity.kt           ← vista 3: dashboard
-│   ├── PacienteListActivity.kt   ← vista 4: lista RecyclerView
-│   ├── PacienteDetailActivity.kt ← vista 5: detalle
-│   └── PacienteFormActivity.kt   ← vista 6: crear/editar
+│   │   ├── CalculoMedico.kt         IMC, edad, clasificación quirúrgica
+│   │   ├── PacienteValidator.kt     validaciones del formulario
+│   │   └── PasswordUtils.kt         hash SHA-256
+│   ├── PacienteViewModel.kt         LiveData + CRUD en coroutines
+│   ├── NotaViewModel.kt             LiveData + CRUD de notas
+│   ├── PacienteAdapter.kt           RecyclerView ListAdapter
+│   ├── NotaAdapter.kt               RecyclerView notas
+│   ├── LoginActivity.kt             vista 1
+│   ├── RegisterActivity.kt          vista 2
+│   ├── MainActivity.kt              vista 3 - dashboard
+│   ├── PacienteListActivity.kt      vista 4 - lista + búsqueda
+│   ├── PacienteDetailActivity.kt    vista 5 - detalle
+│   ├── PacienteFormActivity.kt      vista 6 - crear/editar
+│   └── NotasActivity.kt             vista 7 - notas clínicas
 └── res/
-    ├── layout/
-    │   ├── activity_login.xml
-    │   ├── activity_register.xml
-    │   ├── activity_main.xml
-    │   ├── activity_paciente_list.xml
-    │   ├── activity_paciente_detail.xml
-    │   ├── activity_paciente_form.xml
-    │   └── item_paciente.xml     ← tarjeta del RecyclerView
+    ├── layout/                      7 layouts de Activity + items + dialog
+    ├── drawable/                    gradientes, badges, chips, iconos
     └── values/
-        ├── colors.xml
-        ├── strings.xml
-        └── themes.xml
+        ├── colors.xml               paleta M3 completa
+        ├── themes.xml               estilos y componentes personalizados
+        └── strings.xml
 ```

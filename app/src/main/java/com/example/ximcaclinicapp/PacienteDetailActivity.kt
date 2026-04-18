@@ -8,8 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.ximcaclinicapp.data.Paciente
 import com.example.ximcaclinicapp.databinding.ActivityPacienteDetailBinding
 import com.example.ximcaclinicapp.utils.CalculosMedico
-import com.example.ximcaclinicapp.viewmodel.PacienteViewModel
-import com.example.ximcaclinicapp.R
 
 // Pantalla que muestra todos los datos de un paciente.
 // Llego aquí desde la lista cuando toco una tarjeta.
