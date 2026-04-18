@@ -33,7 +33,7 @@ abstract class AppDatabase : RoomDatabase() {
                     """CREATE TABLE IF NOT EXISTS `notas` (
                         `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                         `pacienteId` INTEGER NOT NULL,
-                        `texto` TEXT NOT NULL,
+                        `texto`  TEXT NOT NULL,
                         `fechaCreacion` TEXT NOT NULL
                     )"""
                 )
