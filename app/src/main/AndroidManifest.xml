@@ -50,6 +50,12 @@
             android:name=".PacienteFormActivity"
             android:exported="false" />
 
+        <!-- Notas de un paciente -->
+        <activity
+            android:name=".NotasActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
     </application>
 
 </manifest>

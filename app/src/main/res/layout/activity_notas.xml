@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/md_theme_light_background"
+    tools:context=".NotasActivity">
+
+    <!-- AppBar con toolbar y nombre del paciente -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/md_theme_light_surface"
+        app:elevation="0dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/md_theme_light_surface"
+            app:navigationIcon="?attr/homeAsUpIndicator"
+            app:title="Notas"
+            app:titleTextColor="@color/text_primary" />
+
+        <TextView
+            android:id="@+id/tvSubtituloPaciente"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="72dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="12dp"
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp"
+            tools:text="Juan Pérez" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Lista de notas -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvNotas"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="88dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <!-- Estado vacío -->
+    <TextView
+        android:id="@+id/tvVacio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:padding="32dp"
+        android:text="Aún no hay notas para este paciente.\nToca + para agregar la primera."
+        android:textColor="@color/text_secondary"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
+    <!-- FAB agregar nota -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAgregarNota"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="20dp"
+        android:contentDescription="Agregar nota"
+        android:src="@drawable/ic_add"
+        app:backgroundTint="@color/md_theme_light_primary"
+        app:tint="@android:color/white" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

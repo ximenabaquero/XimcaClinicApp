@@ -45,6 +45,15 @@ class PacienteDetailActivity : AppCompatActivity() {
         // Lleno todas las vistas con los datos del paciente
         mostrarDatos()
 
+        // Botón NOTAS: abre la pantalla de notas del paciente
+        binding.btnNotas.setOnClickListener {
+            val intent = Intent(this, NotasActivity::class.java).apply {
+                putExtra("pacienteId", paciente.id)
+                putExtra("pacienteNombre", "${paciente.nombre} ${paciente.apellido}")
+            }
+            startActivity(intent)
+        }
+
         // Botón EDITAR: abro el formulario en modo edición, pasándole todos los datos actuales
         binding.btnEditar.setOnClickListener {
             val intent = Intent(this, PacienteFormActivity::class.java).apply {

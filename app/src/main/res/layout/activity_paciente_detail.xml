@@ -270,11 +270,21 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Botón Notas -->
+        <Button
+            android:id="@+id/btnNotas"
+            style="@style/Widget.XimcaClinic.Button.Secondary"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="24dp"
+            android:text="Ver notas del paciente"
+            android:textSize="15sp" />
+
         <!-- Botones Editar / Eliminar -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="12dp"
             android:orientation="horizontal">
 
             <Button
