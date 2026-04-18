@@ -15,11 +15,11 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import java.util.Calendar
 import java.util.TimeZone
 
+// Este formulario sirve tanto para crear un paciente nuevo como para editar uno existente.
+// La diferencia es si recibe un "id" por intent o no.
 class PacienteFormActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPacienteFormBinding
-    // Cambio: Eliminamos Hilt y usamos el delegado normal. 
-    // Como PacienteViewModel hereda de AndroidViewModel, el factory por defecto funciona.
     private val viewModel: PacienteViewModel by viewModels()
     private val validator = PacienteValidator()
 
@@ -36,12 +36,12 @@ class PacienteFormActivity : AppCompatActivity() {
 
         if (modoEdicion) {
             binding.tvTituloForm.text = "Editar Paciente"
-            supportActionBar?.title = "Editar Paciente"
+            supportActionBar?.title   = "Editar Paciente"
             cargarDatosParaEdicion()
         } else {
             binding.tvTituloForm.text = "Nuevo Paciente"
-            supportActionBar?.title = "Nuevo Paciente"
-            binding.toggleEstado.check(R.id.btnEstadoEspera) // estado por defecto
+            supportActionBar?.title   = "Nuevo Paciente"
+            binding.toggleEstado.check(R.id.btnEstadoEspera)
         }
 
         configurarFechaPicker()
@@ -50,6 +50,7 @@ class PacienteFormActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
+    // Si estoy editando, relleno los campos con los datos que ya tenía el paciente
     private fun cargarDatosParaEdicion() {
         binding.etNombre.setText(intent.getStringExtra("nombre"))
         binding.etApellido.setText(intent.getStringExtra("apellido"))
@@ -59,7 +60,6 @@ class PacienteFormActivity : AppCompatActivity() {
         binding.etEstatura.setText(intent.getDoubleExtra("estatura", 0.0).toString())
         binding.etImc.setText(intent.getDoubleExtra("imc", 0.0).toString())
         binding.etAntecedentes.setText(intent.getStringExtra("antecedentes"))
-        // Seleccionar el botón correcto según el estado guardado
         when (intent.getStringExtra("estado")) {
             "EN_CONSULTA" -> binding.toggleEstado.check(R.id.btnEstadoConsulta)
             "ALTA"        -> binding.toggleEstado.check(R.id.btnEstadoAlta)
@@ -67,13 +67,14 @@ class PacienteFormActivity : AppCompatActivity() {
         }
     }
 
+    // El campo de fecha no es editable a mano. Al tocarlo se abre el calendario de Material.
     private fun configurarFechaPicker() {
         val abrirPicker = View.OnClickListener {
             val picker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Fecha de nacimiento")
                 .build()
             picker.addOnPositiveButtonClickListener { millis ->
-                val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+                val cal  = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
                 cal.timeInMillis = millis
                 val dd   = String.format("%02d", cal.get(Calendar.DAY_OF_MONTH))
                 val mm   = String.format("%02d", cal.get(Calendar.MONTH) + 1)
@@ -86,16 +87,16 @@ class PacienteFormActivity : AppCompatActivity() {
         binding.tilFechaNacimiento.setEndIconOnClickListener(abrirPicker)
     }
 
+    // Cada vez que el usuario escribe peso o estatura, recalculo el IMC en tiempo real
     private fun configurarCalculoImc() {
         val watcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                val peso = binding.etPeso.text.toString().toDoubleOrNull()
+                val peso     = binding.etPeso.text.toString().toDoubleOrNull()
                 val estatura = binding.etEstatura.text.toString().toDoubleOrNull()
-
                 if (peso != null && estatura != null && estatura > 0) {
-                    val imc = CalculosMedico.calcularIMC(peso, estatura)
+                    val imc   = CalculosMedico.calcularIMC(peso, estatura)
                     val nivel = CalculosMedico.obtenerNivelPeso(imc)
                     binding.etImc.setText("$imc — $nivel")
                 } else {
@@ -126,38 +127,38 @@ class PacienteFormActivity : AppCompatActivity() {
     }
 
     private fun validateFields(): Boolean {
-        val nombre = binding.etNombre.text.toString()
-        val apellido = binding.etApellido.text.toString()
-        val fecha = binding.etFechaNacimiento.text.toString()
-        val pesoStr = binding.etPeso.text.toString()
+        val nombre    = binding.etNombre.text.toString()
+        val apellido  = binding.etApellido.text.toString()
+        val fecha     = binding.etFechaNacimiento.text.toString()
+        val pesoStr   = binding.etPeso.text.toString()
         val estaturaStr = binding.etEstatura.text.toString()
 
         val errors = validator.validateFields(nombre, apellido, fecha, pesoStr, estaturaStr)
 
-        binding.tilNombre.error = errors["nombre"]
-        binding.tilApellido.error = errors["apellido"]
+        binding.tilNombre.error          = errors["nombre"]
+        binding.tilApellido.error        = errors["apellido"]
         binding.tilFechaNacimiento.error = errors["fechaNacimiento"]
-        binding.tilPeso.error = errors["peso"]
-        binding.tilEstatura.error = errors["estatura"]
+        binding.tilPeso.error            = errors["peso"]
+        binding.tilEstatura.error        = errors["estatura"]
 
         return errors.isEmpty()
     }
 
     private fun createPacienteFromForm(): Paciente {
-        val peso = binding.etPeso.text.toString().toDoubleOrNull() ?: 0.0
+        val peso     = binding.etPeso.text.toString().toDoubleOrNull() ?: 0.0
         val estatura = binding.etEstatura.text.toString().toDoubleOrNull() ?: 0.0
-        
+
         return Paciente(
-            id = if (modoEdicion) pacienteId else 0,
-            nombre = binding.etNombre.text.toString().trim(),
-            apellido = binding.etApellido.text.toString().trim(),
+            id              = if (modoEdicion) pacienteId else 0,
+            nombre          = binding.etNombre.text.toString().trim(),
+            apellido        = binding.etApellido.text.toString().trim(),
             fechaNacimiento = binding.etFechaNacimiento.text.toString().trim(),
-            telefono = binding.etTelefono.text.toString().trim(),
-            peso = peso,
-            estatura = estatura,
-            imc = CalculosMedico.calcularIMC(peso, estatura),
-            antecedentes = binding.etAntecedentes.text.toString().trim(),
-            estado = when (binding.toggleEstado.checkedButtonId) {
+            telefono        = binding.etTelefono.text.toString().trim(),
+            peso            = peso,
+            estatura        = estatura,
+            imc             = CalculosMedico.calcularIMC(peso, estatura),
+            antecedentes    = binding.etAntecedentes.text.toString().trim(),
+            estado          = when (binding.toggleEstado.checkedButtonId) {
                 R.id.btnEstadoConsulta -> "EN_CONSULTA"
                 R.id.btnEstadoAlta     -> "ALTA"
                 else                   -> "EN_ESPERA"

@@ -12,8 +12,7 @@ import com.example.ximcaclinicapp.databinding.ActivityRegisterBinding
 import com.example.ximcaclinicapp.utils.PasswordUtils
 import kotlinx.coroutines.launch
 
-// RegisterActivity es la pantalla donde el médico crea su cuenta.
-// Solo se llega aquí desde el link en LoginActivity.
+// Pantalla de registro. Solo se llega aquí desde el link en LoginActivity.
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityRegisterBinding
@@ -24,70 +23,53 @@ class RegisterActivity : AppCompatActivity() {
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Inicializamos el DAO desde la base de datos Singleton, igual que en LoginActivity
         usuarioDao = AppDatabase.getDatabase(this).usuarioDao()
 
         binding.btnRegistrar.setOnClickListener {
-            val nombre = binding.etNombre.text.toString().trim()
-            val email = binding.etEmailReg.text.toString().trim()
+            val nombre   = binding.etNombre.text.toString().trim()
+            val email    = binding.etEmailReg.text.toString().trim()
             val password = binding.etPasswordReg.text.toString().trim()
 
-            // --- VALIDACIONES ---
-            // Estas validaciones cumplen con el requisito mínimo del proyecto:
-            // email no vacío + contraseña de al menos 6 caracteres.
-
+            // Validaciones: los tres campos son obligatorios
             if (nombre.isEmpty()) {
                 binding.tilNombre.error = "El nombre es obligatorio"
                 return@setOnClickListener
             } else binding.tilNombre.error = null
 
-            // Verifico que el email tenga @ para asegurar que es un correo real
             if (email.isEmpty() || !email.contains("@")) {
                 binding.tilEmailReg.error = "Ingresa un correo electrónico válido"
                 return@setOnClickListener
             } else binding.tilEmailReg.error = null
 
-            // Requisito del proyecto: contraseña mínimo 6 caracteres
+            // La contraseña debe tener mínimo 6 caracteres
             if (password.length < 6) {
                 binding.tilPasswordReg.error = "La contraseña debe tener al menos 6 caracteres"
                 return@setOnClickListener
             } else binding.tilPasswordReg.error = null
 
-            // Mostrar indicador de carga
             binding.btnRegistrar.isEnabled = false
             binding.progressBar.visibility = View.VISIBLE
 
-            // Todo válido: creo el objeto Usuario y lo guardo en la base de datos
             lifecycleScope.launch {
-                // Hasheo la contraseña con SHA-256 antes de guardarla.
-                // Así aunque alguien vea la base de datos, no ve la contraseña en texto plano.
+                // Guardo la contraseña hasheada con SHA-256, no en texto plano
                 val hashedPassword = PasswordUtils.hashPassword(password)
                 val nuevoUsuario = Usuario(
-                    nombre = nombre,
-                    email = email,
+                    nombre   = nombre,
+                    email    = email,
                     password = hashedPassword
-                    // rol se queda en "MÉDICO" por defecto (está definido en la clase Usuario)
+                    // rol queda como "MÉDICO" por defecto
                 )
                 usuarioDao.registrarUsuario(nuevoUsuario)
 
-                // Volver al hilo principal para actualizar UI
                 runOnUiThread {
                     binding.btnRegistrar.isEnabled = true
                     binding.progressBar.visibility = View.GONE
-
-                    Toast.makeText(
-                        this@RegisterActivity,
-                        "Cuenta creada exitosamente. Inicia sesión.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
-                    // finish() cierra esta pantalla y regresa automáticamente al Login
-                    finish()
+                    Toast.makeText(this@RegisterActivity, "Cuenta creada. Inicia sesión.", Toast.LENGTH_SHORT).show()
+                    finish() // Regresa automáticamente al Login
                 }
             }
         }
 
-        // El link de "ya tengo cuenta" también cierra esta pantalla y vuelve al Login
         binding.tvVolverLogin.setOnClickListener { finish() }
     }
 }

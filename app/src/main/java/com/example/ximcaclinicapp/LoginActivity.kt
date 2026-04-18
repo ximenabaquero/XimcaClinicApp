@@ -19,8 +19,8 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Si ya hay una sesión activa, salto directo al dashboard sin mostrar el login
         val prefs = getSharedPreferences("session", MODE_PRIVATE)
-
         if (prefs.contains("userId")) {
             startActivity(Intent(this, MainActivity::class.java))
             finish()
@@ -29,14 +29,14 @@ class LoginActivity : AppCompatActivity() {
 
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        
-        // Inicializamos el DAO desde la base de datos Singleton
+
         usuarioDao = AppDatabase.getDatabase(this).usuarioDao()
 
         binding.btnLogin.setOnClickListener {
-            val email = binding.etEmail.text.toString().trim()
+            val email    = binding.etEmail.text.toString().trim()
             val password = binding.etPassword.text.toString().trim()
 
+            // Validaciones básicas antes de consultar la base de datos
             if (email.isEmpty()) {
                 binding.tilEmail.error = "Ingresa tu correo"
                 return@setOnClickListener
@@ -52,9 +52,11 @@ class LoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             } else binding.tilPassword.error = null
 
+            // Deshabilito el botón para que no se presione dos veces mientras carga
             binding.btnLogin.isEnabled = false
             binding.progressBar.visibility = View.VISIBLE
 
+            // La consulta a Room debe hacerse fuera del hilo principal
             lifecycleScope.launch {
                 val user = usuarioDao.login(email, password)
 
@@ -63,28 +65,21 @@ class LoginActivity : AppCompatActivity() {
                     binding.progressBar.visibility = View.GONE
 
                     if (user != null) {
+                        // Guardo los datos del usuario en SharedPreferences
+                        // para poder acceder a ellos desde otras pantallas
                         prefs.edit()
-                            .putInt("userId", user.id)
-                            .putString("userName", user.nombre)
+                            .putInt("userId",    user.id)
+                            .putString("userName",  user.nombre)
                             .putString("userEmail", user.email)
-                            .putString("userRol", user.rol)
+                            .putString("userRol",   user.rol)
                             .apply()
 
-                        Toast.makeText(
-                            this@LoginActivity,
-                            "Bienvenido, ${user.nombre}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-
+                        Toast.makeText(this@LoginActivity, "Bienvenido, ${user.nombre}", Toast.LENGTH_SHORT).show()
                         startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                         finish()
                     } else {
-                        Toast.makeText(
-                            this@LoginActivity,
-                            "Correo o contraseña incorrectos",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast.makeText(this@LoginActivity, "Correo o contraseña incorrectos", Toast.LENGTH_SHORT).show()
                     }
                 }
             }

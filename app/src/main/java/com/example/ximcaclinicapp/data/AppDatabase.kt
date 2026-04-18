@@ -7,6 +7,9 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
+// Le digo a Room cuáles son mis tablas y en qué versión está la base de datos.
+// Cada vez que agrego o cambio algo en las tablas, subo el número de versión
+// y creo una migración para no perder los datos del usuario.
 @Database(
     entities = [Paciente::class, Usuario::class, Nota::class],
     version = 3,
@@ -23,7 +26,7 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
-        // Migración 1→2: crea la tabla de notas sin tocar datos existentes
+        // Versión 2: agregué la tabla de notas para poder guardar notas por paciente
         private val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL(
@@ -37,7 +40,8 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
-        // Migración 2→3: agrega columna de teléfono a pacientes existentes
+        // Versión 3: agregué el campo teléfono a la tabla de pacientes.
+        // Uso ALTER TABLE para no borrar los pacientes que ya estaban guardados.
         private val MIGRATION_2_3 = object : Migration(2, 3) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL(
@@ -46,6 +50,8 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        // Esta función devuelve siempre la misma instancia de la base de datos.
+        // Si no existe todavía, la crea. Así evito abrir múltiples conexiones.
         fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(

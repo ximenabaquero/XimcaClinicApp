@@ -1,33 +1,26 @@
 package com.example.ximcaclinicapp.utils
 
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 import kotlin.math.pow
 
-// object significa que esta clase es un Singleton: solo existe una instancia.
-// La uso para agrupar funciones de cálculo médico que no necesitan guardar estado.
-// Para usarla escribo: CalculosMedico.calcularIMC(...)
+// Clase de utilidades médicas. La declaro como object para poder usarla
+// sin crear instancias: CalculosMedico.calcularIMC(...)
 object CalculosMedico {
 
-    // Fórmula del IMC: peso (kg) dividido entre estatura (m) al cuadrado.
-    // Ejemplo: 65 kg / (1.70)² = 65 / 2.89 = 22.49
-    // Si la estatura es 0 o negativa, devuelvo 0 para evitar dividir entre cero.
-    // String.format con Locale.US asegura que el decimal use punto (22.49) y no coma (22,49),
-    // porque si uso coma, toDouble() falla al convertir de vuelta.
+    // Fórmula del IMC: peso dividido entre estatura al cuadrado
+    // Uso Locale.US para que el decimal use punto y no coma
     fun calcularIMC(peso: Double, estatura: Double): Double {
         if (estatura <= 0.0) return 0.0
         val imc = peso / estatura.pow(2)
         return String.format(Locale.US, "%.2f", imc).toDouble()
     }
 
-    // Versión resumida usada en las tarjetas del listado y el formulario (texto corto).
-    // Llama internamente a la clasificación completa para no duplicar la lógica de rangos.
+    // Devuelve solo la categoría (ej: "Sobrepeso"), usada en las tarjetas de la lista
     fun obtenerNivelPeso(imc: Double): String =
         obtenerClasificacionCirugiaPlastica(imc).categoria
 
-    /**
-     * Calcula la edad en años a partir de una fecha en formato "dd/MM/yyyy".
-     * Devuelve "-- años" si la fecha no es válida.
-     */
+    // Calcula la edad a partir de la fecha en formato dd/MM/yyyy
     fun calcularEdad(fechaNacimiento: String): String {
         return try {
             val partes = fechaNacimiento.split("/")
@@ -40,7 +33,6 @@ object CalculosMedico {
             val nacimiento = Calendar.getInstance().apply { set(anio, mes - 1, dia) }
 
             var edad = hoy.get(Calendar.YEAR) - nacimiento.get(Calendar.YEAR)
-            // Ajuste si aún no ha llegado el cumpleaños este año
             if (hoy.get(Calendar.DAY_OF_YEAR) < nacimiento.get(Calendar.DAY_OF_YEAR)) edad--
 
             "$edad años"
@@ -49,10 +41,8 @@ object CalculosMedico {
         }
     }
 
-    /**
-     * Clasificación de IMC para Consultorio de Cirugía Plástica.
-     * Basado en criterios OMS y clasificación quirúrgica estándar (ASA/Clasificación de Obesidad).
-     */
+    // Clasificación detallada del IMC orientada a cirugía plástica.
+    // Incluye categoría, grado y una nota clínica relevante para el médico.
     fun obtenerClasificacionCirugiaPlastica(imc: Double): ClasificacionIMC {
         return when {
             imc < 18.5 -> ClasificacionIMC(
@@ -89,11 +79,9 @@ object CalculosMedico {
     }
 }
 
-/**
- * Modelo de datos específico para historia clínica de Cirugía Plástica.
- */
+// Modelo que agrupa los tres datos de la clasificación
 data class ClasificacionIMC(
-    val categoria: String,             // Ej: "Normopeso"
-    val grado: String,                 // Ej: "Grado I (Leve)"
-    val relevanciaQuirurgica: String   // Nota clínica para el cirujano o consentimiento informado
+    val categoria: String,
+    val grado: String,
+    val relevanciaQuirurgica: String
 )
